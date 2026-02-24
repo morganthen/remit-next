@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export default function Home() {
   return (
-    <main className="bg- flex min-h-screen flex-col items-center justify-center p-24">
+    <main className="bg- flex min-h-screen flex-col items-center justify-center bg-stone-950 p-24">
       <h1 className="mb-8 text-4xl font-bold">Remit 2.0</h1>
       <Link
         href="/dashboard"

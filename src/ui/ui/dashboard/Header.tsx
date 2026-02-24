@@ -7,7 +7,7 @@ import Image from 'next/image';
 
 export default function Header() {
   return (
-    <div className="flex h-full items-center justify-between bg-slate-200 px-4 py-2 md:justify-end">
+    <div className="flex h-full items-center justify-between bg-stone-100 px-4 py-2 md:justify-end">
       {/* Left: Logo */}
       <div className="-ml-6 md:hidden">
         <Image
