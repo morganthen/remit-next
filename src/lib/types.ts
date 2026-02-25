@@ -1,9 +1,10 @@
 export type Invoice = {
+  id: string; // changed from number to string (UUID)
   amount: number;
-  client_id: string;
-  client_name: string;
-  created_at: string;
-  number: string;
   due_date: string;
-  id: number;
+  status: string;
+  created_at: string;
+  inv_num: number; // changed from string to number
+  client_name: string;
+  clients: { email: string };
 };

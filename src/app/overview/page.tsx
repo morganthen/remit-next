@@ -1,4 +1,4 @@
-import InvoiceCard from '@/components/InvoiceCard';
+import InvoiceCard from '@/components/StatCard';
 import RecentInvoices from '@/components/invoices/RecentInvoices';
 import Link from 'next/link';
 import CreateInvoiceButton from '@/components/invoices/CreateInvoiceButton';
@@ -26,7 +26,7 @@ export default function Page() {
         </Link>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex w-full flex-col gap-3">
         <RecentInvoices />
       </div>
       <CreateInvoiceButton />

@@ -3,7 +3,6 @@ import InvoiceRow from './InvoiceRow';
 
 export default async function RecentInvoices() {
   const invoices = await getInvoices();
-  console.log(invoices);
 
   return (
     <ul>
