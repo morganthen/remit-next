@@ -1,5 +1,5 @@
-import SideNav from '@/ui/ui/dashboard/SideNav';
-import Header from '@/ui/ui/dashboard/Header';
+import SideNav from '@/components/SideNav';
+import Header from '@/components/Header';
 
 export default function DashboardLayout({
   children,
@@ -7,7 +7,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="h-screen bg-stone-100 text-stone-700 md:grid md:grid-cols-[16rem_1fr] md:grid-rows-[auto_1fr]">
+    <div className="bg-stone-0 h-screen text-stone-700 md:grid md:grid-cols-[16rem_1fr] md:grid-rows-[auto_1fr]">
       <aside className="fixed inset-x-0 bottom-0 z-30 h-14 md:static md:row-span-2 md:h-full md:border-r md:border-stone-200">
         <SideNav />
       </aside>

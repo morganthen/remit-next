@@ -1,9 +1,9 @@
-import Button from '@/ui/Button';
 import {
   ArrowLeftEndOnRectangleIcon,
   MoonIcon,
 } from '@heroicons/react/24/outline';
 import Image from 'next/image';
+import { ButtonWithIcon } from './ButtonWithIcon';
 
 export default function Header() {
   return (
@@ -20,13 +20,16 @@ export default function Header() {
       </div>
 
       {/* Right: Username, Theme, Sign Out */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-4">
         <p className="text-sm">
           <span className="hidden md:inline">Welcome </span>
           Morgan
         </p>
-        <Button icon={MoonIcon}>UI</Button>
-        <Button icon={ArrowLeftEndOnRectangleIcon}>Sign Out</Button>
+        <ButtonWithIcon icon={MoonIcon} variant="outline"></ButtonWithIcon>
+        <ButtonWithIcon
+          icon={ArrowLeftEndOnRectangleIcon}
+          variant="outline"
+        ></ButtonWithIcon>
       </div>
     </div>
   );
