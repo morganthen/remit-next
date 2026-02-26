@@ -1,7 +1,7 @@
-import InvoiceCard from '@/components/StatCard';
 import RecentInvoices from '@/components/invoices/RecentInvoices';
 import Link from 'next/link';
 import CreateInvoiceButton from '@/components/invoices/CreateInvoiceButton';
+import StatsSection from '@/components/StatsSection';
 
 export default function Page() {
   return (
@@ -9,10 +9,7 @@ export default function Page() {
       <h1 className="my-4 w-full max-w-full border-b border-stone-200 pb-2 text-2xl font-semibold tracking-tight text-stone-800">
         Overview
       </h1>
-      <div className="grid w-full max-w-3xl grid-cols-2 gap-3 md:gap-6">
-        <InvoiceCard title="Amount Collected" invoice="$4321.00" />
-        <InvoiceCard title="Amount Owing" invoice="$1234.00" />
-      </div>
+      <StatsSection />
       {/*invoice overview*/}
       <div className="my-4 flex w-full max-w-full items-center justify-between border-b border-stone-200 pb-2">
         <h1 className="text-2xl font-semibold tracking-tight text-stone-800">
@@ -26,7 +23,7 @@ export default function Page() {
         </Link>
       </div>
 
-      <div className="flex w-full flex-col gap-3">
+      <div className="mb-10 flex w-full flex-col gap-3">
         <RecentInvoices />
       </div>
       <CreateInvoiceButton />

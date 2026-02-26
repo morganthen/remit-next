@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './_styles/globals.css';
+import { Toaster } from 'sonner';
 
 export const metadata: Metadata = {
   title: 'Remit 2.0',
@@ -13,7 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <Toaster richColors />
+      </body>
     </html>
   );
 }

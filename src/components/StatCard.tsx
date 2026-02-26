@@ -2,7 +2,7 @@ import { CardContent, Card, CardHeader, CardTitle } from './ui/card';
 
 type StatCard = {
   title: string;
-  invoice: string; // this will change later depending on what is returned by Supabase
+  invoice: string;
 };
 
 export default function InvoiceCard({ title, invoice }: StatCard) {

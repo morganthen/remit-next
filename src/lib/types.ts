@@ -8,3 +8,5 @@ export type Invoice = {
   client_name: string;
   clients: { email: string };
 };
+
+export type newInvoice = {};

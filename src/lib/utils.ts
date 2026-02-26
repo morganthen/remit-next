@@ -16,3 +16,7 @@ export function formatDate(dateString: string): string {
 export function formatCurrency(amount: number): string {
   return `$${amount.toFixed(2)}`;
 }
+
+export function capitalize(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
