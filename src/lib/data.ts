@@ -82,21 +82,34 @@ export async function getTotalOwed() {
 //   }
 // }
 
+// ...existing code...
 export async function deleteInvoice(
   id: string
-): Promise<{ sucess: boolean; error?: string }> {
+): Promise<{ success: boolean; error?: string }> {
   try {
-    const { error } = await supabase.from('invoices').delete().eq('id', id);
+    // request deleted row back so we can inspect response
+    const { data, error } = await supabase
+      .from('invoices')
+      .delete()
+      .eq('id', id)
+      .select();
+
+    console.log('supabase.delete response:', { id, data, error });
 
     if (error) {
       console.error(error);
       throw new Error('Invoice could not be deleted');
     }
-    return { sucess: true };
+    // if no rows returned, log that too
+    if (!data || (Array.isArray(data) && data.length === 0)) {
+      console.warn('Delete returned no rows for id:', id);
+    }
+
+    return { success: true };
   } catch (e) {
     const errorMessage =
       e instanceof Error ? e.message : 'An unknown error occurred';
     console.error('Delete invoice failed', errorMessage);
-    return { sucess: false, error: errorMessage };
+    return { success: false, error: errorMessage };
   }
 }

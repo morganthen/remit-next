@@ -9,6 +9,7 @@ import { capitalize } from '@/lib/utils';
 import { deleteInvoice } from '@/lib/data';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import ActionButton from './ActionButton';
 
 type InvoiceRowProps = {
   invoice: Invoice;
@@ -20,41 +21,59 @@ export default function InvoiceRow({ invoice }: InvoiceRowProps) {
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    console.log("InvoiceRow mounted for id:', invoice.id");
+  }, [invoice.id]);
+
+  useEffect(() => {
     if (!menuOpen) {
       return;
     }
 
     function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setMenuOpen(false);
+      const target = event.target as Node;
+
+      // Ignore clicks inside the menu
+      if (menuRef.current && menuRef.current.contains(target)) {
+        return;
       }
+
+      // Ignore clicks inside any AlertDialog portal (rendered in document.body)
+      const alertDialogContent = document.querySelector('[role="alertdialog"]');
+      if (alertDialogContent && alertDialogContent.contains(target)) {
+        return;
+      }
+
+      setMenuOpen(false);
     }
 
-    // Bind the event listener only when the menu is open
+    // Bind event listener only when the menu is open
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      // Unbind the event listener on clean up
+      // clean up
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [menuOpen]); // <-- Add menuOpen here
+  }, [menuOpen]);
 
   async function handleDelete() {
-    const confirmed = window.confirm(
-      'Are you sure you want to delete this invoice? This action cannot be undone'
-    );
-
-    if (confirmed) {
+    try {
+      console.log('handleDelete initiated for ID:', invoice.id);
       const result = await deleteInvoice(invoice.id);
-      if (result.sucess) {
+      console.log('deleteInvoice result:', result);
+      if (result.success) {
         toast.success('Invoice deleted successfully', {
           position: 'top-center',
         });
         router.refresh();
       } else {
-        toast.error('failed to delete invoice: ${result.error}', {
+        toast.error(`failed to delete invoice: ${result.error}`, {
           position: 'top-center',
         });
       }
+    } catch (err) {
+      console.error('handleDelete unexpected error:', err);
+      toast.error('Unexpected error deleting invoice', {
+        position: 'top-center',
+      });
     }
   }
 
@@ -94,25 +113,16 @@ export default function InvoiceRow({ invoice }: InvoiceRowProps) {
         ref={menuRef}
         className="relative col-span-1 col-end-9 flex justify-end"
       >
-        <Button variant="outline" onClick={() => setMenuOpen((prev) => !prev)}>
+        <Button
+          variant="outline"
+          onClick={() => {
+            console.log('menu toggle clicked, prev:', menuOpen);
+            setMenuOpen((prev) => !prev);
+          }}
+        >
           <Bars3Icon />
         </Button>
-        {menuOpen && (
-          <div className="absolute top-full right-0 z-10 mt-1 w-36 rounded-md border border-stone-200 bg-white py-1 shadow-md">
-            <button className="w-full px-4 py-2 text-left text-sm hover:bg-stone-50">
-              View
-            </button>
-            <button className="w-full px-4 py-2 text-left text-sm hover:bg-stone-50">
-              Edit
-            </button>
-            <button
-              className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-stone-50"
-              onClick={handleDelete}
-            >
-              Delete
-            </button>
-          </div>
-        )}
+        {menuOpen && <ActionButton onDelete={handleDelete} />}
       </div>
     </div>
   );
