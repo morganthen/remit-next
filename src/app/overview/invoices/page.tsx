@@ -1,3 +1,10 @@
+import InvoiceForm from '@/components/invoices/InvoiceForm';
+
 export default function Page() {
-  return <p>Invoice Page</p>;
+  return (
+    <div>
+      <p>Invoice Page</p>
+      <InvoiceForm />
+    </div>
+  );
 }

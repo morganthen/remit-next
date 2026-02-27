@@ -4,6 +4,7 @@ import {
 } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import { ButtonWithIcon } from './ButtonWithIcon';
+import { logout } from '@/lib/auth/actions';
 
 export default function Header() {
   return (
@@ -26,10 +27,13 @@ export default function Header() {
           Morgan
         </p>
         <ButtonWithIcon icon={MoonIcon} variant="outline"></ButtonWithIcon>
-        <ButtonWithIcon
-          icon={ArrowLeftEndOnRectangleIcon}
-          variant="outline"
-        ></ButtonWithIcon>
+        <form action={logout}>
+          <ButtonWithIcon
+            icon={ArrowLeftEndOnRectangleIcon}
+            variant="outline"
+            type="submit"
+          />
+        </form>
       </div>
     </div>
   );

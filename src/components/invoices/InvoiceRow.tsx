@@ -6,7 +6,7 @@ import { Invoice } from '@/lib/types';
 import { Button } from '../ui/button';
 import { Bars3Icon } from '@heroicons/react/24/outline';
 import { capitalize } from '@/lib/utils';
-import { deleteInvoice } from '@/lib/data';
+import { deleteInvoice } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import ActionButton from './ActionButton';
@@ -94,7 +94,7 @@ export default function InvoiceRow({ invoice }: InvoiceRowProps) {
       <div className="col-span-2 col-start-2">
         <p>{invoice.client_name}</p>
         <p className="hidden text-xs text-stone-400 md:block">
-          {invoice.clients.email}
+          {invoice.clients?.email ?? 'No email'}
         </p>
       </div>
       {/*amount and date*/}

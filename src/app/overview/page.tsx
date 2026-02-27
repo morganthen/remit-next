@@ -2,8 +2,14 @@ import RecentInvoices from '@/components/invoices/RecentInvoices';
 import Link from 'next/link';
 import CreateInvoiceButton from '@/components/invoices/CreateInvoiceButton';
 import StatsSection from '@/components/StatsSection';
+import { getNextInvoiceNumber, getClients } from '@/lib/data';
 
-export default function Page() {
+export default async function Page() {
+  const [clients, nextInvoiceNumber] = await Promise.all([
+    getClients(),
+    getNextInvoiceNumber(),
+  ]);
+
   return (
     <div className="flex flex-col items-center justify-center px-8 md:mx-auto md:max-w-3xl">
       <h1 className="my-4 w-full max-w-full border-b border-stone-200 pb-2 text-2xl font-semibold tracking-tight text-stone-800">
@@ -26,7 +32,10 @@ export default function Page() {
       <div className="mb-10 flex w-full flex-col gap-3">
         <RecentInvoices />
       </div>
-      <CreateInvoiceButton />
+      <CreateInvoiceButton
+        clients={clients}
+        nextInvoiceNumber={nextInvoiceNumber}
+      />
     </div>
   );
 }

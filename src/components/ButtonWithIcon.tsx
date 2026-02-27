@@ -13,6 +13,7 @@ type ButtonWithIconProps = {
   icon?: ComponentType<SVGProps<SVGSVGElement>>;
   className?: string;
   onClick?: () => void;
+  type?: 'button' | 'submit' | 'reset';
 };
 
 export function ButtonWithIcon({
@@ -21,9 +22,16 @@ export function ButtonWithIcon({
   icon: Icon,
   className,
   onClick,
+  type = 'button',
 }: ButtonWithIconProps) {
   return (
-    <Button onClick={onClick} variant={variant} size="sm" className={className}>
+    <Button
+      onClick={onClick}
+      variant={variant}
+      size="sm"
+      className={className}
+      type={type}
+    >
       {Icon && <Icon className="h-4 w-4 shrink-0" />}
       <span className="hidden md:inline">{children}</span>
     </Button>

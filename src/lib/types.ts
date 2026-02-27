@@ -9,4 +9,10 @@ export type Invoice = {
   clients: { email: string };
 };
 
+export type Client = {
+  id: string;
+  name: string;
+  email: string;
+};
+
 export type newInvoice = {};
