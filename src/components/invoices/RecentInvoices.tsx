@@ -1,10 +1,11 @@
+import { getRecentInvoices } from '@/lib/data';
 import InvoiceRow from './InvoiceRow';
-import { Invoice } from '@/lib/types';
 
-export default function RecentInvoices({ invoices }: { invoices: Invoice[] }) {
+export default async function RecentInvoices() {
+  const recentInvoices = await getRecentInvoices();
   return (
     <ul>
-      {invoices?.map((invoice) => (
+      {recentInvoices?.map((invoice) => (
         <li key={invoice.id}>
           <InvoiceRow invoice={invoice} />
         </li>

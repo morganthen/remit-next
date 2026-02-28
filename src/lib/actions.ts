@@ -100,7 +100,7 @@ export async function createInvoice(
     client_email: invoiceData.client_email,
     amount: invoiceData.amount,
     due_date: invoiceData.due_date,
-    status: invoiceData.status,
+    status: 'draft',
     user_id: user.id,
     inv_num: nextInvNum,
   });
@@ -193,4 +193,46 @@ export async function markInvoicePaid(
   }
 
   return { success: true };
+}
+
+export async function markInvoiceUnpaid(
+  id: string
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { success: false, error: 'Not authenticated' };
+
+  const { data, error } = await supabase
+    .from('invoices')
+    .update({ status: 'unpaid' })
+    .eq('id', id)
+    .eq('user_id', user.id)
+    .select();
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  if (!data || data.length === 0) {
+    return { success: false, error: 'Invoice not found or not owned by you' };
+  }
+
+  return { success: true };
+}
+
+export async function markInvoiceOverdue(id: string): Promise<void> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+  await supabase
+    .from('invoices')
+    .update({ status: 'overdue' })
+    .eq('id', id)
+    .eq('user_id', user.id);
 }

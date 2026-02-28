@@ -124,30 +124,6 @@ export default function InvoiceForm({
         )}
       </div>
 
-      {/* Status */}
-      <div>
-        <Label>Status</Label>
-        <Select
-          defaultValue="draft"
-          onValueChange={(value) =>
-            setValue('status', value as InvoiceFormData['status'])
-          }
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="draft">Draft</SelectItem>
-            <SelectItem value="unpaid">Unpaid</SelectItem>
-            <SelectItem value="paid">Paid</SelectItem>
-            <SelectItem value="overdue">Overdue</SelectItem>
-          </SelectContent>
-        </Select>
-        {errors.status && (
-          <p className="mt-1 text-xs text-red-500">{errors.status.message}</p>
-        )}
-      </div>
-
       {/* Actions */}
       <div className="flex justify-end gap-2 pt-2">
         <Button type="button" variant="outline" onClick={onCancel}>

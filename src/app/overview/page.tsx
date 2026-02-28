@@ -35,7 +35,7 @@ export default async function Page() {
       </div>
 
       <div className="mb-10 flex w-full flex-col gap-3">
-        <RecentInvoices invoices={invoices} />
+        <RecentInvoices />
       </div>
       <CreateInvoiceButton
         clients={clients}
