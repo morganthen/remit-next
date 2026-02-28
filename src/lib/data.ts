@@ -1,7 +1,8 @@
 import { createClient } from './supabase/server';
-import { Invoice, newInvoice as newInvoiceType, Client } from './types';
+import { Invoice, Client } from './types';
 
-export async function getInvoices(): Promise<Invoice[]> {
+// creates client and gets user once (attempting to f)
+async function getSupabaseWithUser() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -9,7 +10,15 @@ export async function getInvoices(): Promise<Invoice[]> {
 
   if (!user) throw new Error('Not authenticated');
 
-  const { data, error } = await supabase
+  return { supabase, user };
+}
+
+export async function getInvoices(
+  showVoid: boolean = false
+): Promise<Invoice[]> {
+  const { supabase, user } = await getSupabaseWithUser();
+
+  let query = supabase
     .from('invoices')
     .select(
       `
@@ -20,12 +29,17 @@ export async function getInvoices(): Promise<Invoice[]> {
       created_at,
       inv_num,
       client_name,
-      clients (
-        email
-      )
+      client_email
     `
     )
-    .eq('user_id', user.id);
+    .eq('user_id', user.id)
+    .order('inv_num', { ascending: false });
+
+  if (!showVoid) {
+    query = query.neq('status', 'void');
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error(error);
@@ -35,12 +49,7 @@ export async function getInvoices(): Promise<Invoice[]> {
 }
 
 export async function getClients(): Promise<Client[]> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) throw new Error('Not authenticated');
+  const { supabase, user } = await getSupabaseWithUser();
 
   const { data, error } = await supabase
     .from('clients')
@@ -57,12 +66,7 @@ export async function getClients(): Promise<Client[]> {
 }
 
 export async function getNextInvoiceNumber(): Promise<number> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) throw new Error('Not authenticated');
+  const { supabase, user } = await getSupabaseWithUser();
 
   const { data, error } = await supabase
     .from('invoices')
@@ -83,12 +87,7 @@ export async function getNextInvoiceNumber(): Promise<number> {
 }
 
 export async function getTotalCollected() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) throw new Error('Not authenticated');
+  const { supabase, user } = await getSupabaseWithUser();
 
   const { data, error } = await supabase
     .from('invoices')
@@ -104,12 +103,7 @@ export async function getTotalCollected() {
 }
 
 export async function getTotalOwed() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) throw new Error('Not authenticated');
+  const { supabase, user } = await getSupabaseWithUser();
 
   const { data, error } = await supabase
     .from('invoices')
@@ -123,17 +117,3 @@ export async function getTotalOwed() {
   }
   return data?.reduce((acc, inv) => acc + inv.amount, 0) ?? 0;
 }
-
-// export async function createInvoice({ newInvoice }: newInvoiceType) {
-//   const { data, error } = await supabase
-//     .from('invoices')
-//     .insert([{ some_column: 'someValue', other_column: 'otherValue' }])
-//     .select();
-
-//   if (error) {
-//     console.error(error);
-//     throw new Error('Invoice could not be created');
-//   }
-// }
-
-// ...existing code...

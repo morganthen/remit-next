@@ -25,11 +25,13 @@ type Client = {
 type CreateInvoiceButtonProps = {
   clients: Client[];
   nextInvoiceNumber: number;
+  className: string;
 };
 
 export default function CreateInvoiceButton({
   clients,
   nextInvoiceNumber,
+  className,
 }: CreateInvoiceButtonProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
@@ -51,10 +53,7 @@ export default function CreateInvoiceButton({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          size="icon-sm"
-          className="fixed right-5 bottom-20 rounded-full shadow-lg md:right-8 md:bottom-10 md:h-12 md:w-12"
-        >
+        <Button size="icon-sm" className={className}>
           <PlusIcon />
         </Button>
       </DialogTrigger>

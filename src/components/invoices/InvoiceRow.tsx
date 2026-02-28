@@ -6,7 +6,7 @@ import { Invoice } from '@/lib/types';
 import { Button } from '../ui/button';
 import { Bars3Icon } from '@heroicons/react/24/outline';
 import { capitalize } from '@/lib/utils';
-import { deleteInvoice } from '@/lib/actions';
+import { voidInvoice } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import ActionButton from './ActionButton';
@@ -54,47 +54,38 @@ export default function InvoiceRow({ invoice }: InvoiceRowProps) {
     };
   }, [menuOpen]);
 
-  async function handleDelete() {
-    try {
-      console.log('handleDelete initiated for ID:', invoice.id);
-      const result = await deleteInvoice(invoice.id);
-      console.log('deleteInvoice result:', result);
-      if (result.success) {
-        toast.success('Invoice deleted successfully', {
-          position: 'top-center',
-        });
-        router.refresh();
-      } else {
-        toast.error(`failed to delete invoice: ${result.error}`, {
-          position: 'top-center',
-        });
-      }
-    } catch (err) {
-      console.error('handleDelete unexpected error:', err);
-      toast.error('Unexpected error deleting invoice', {
+  async function handleVoid() {
+    const result = await voidInvoice(invoice.id);
+    if (result.success) {
+      toast.success('Invoice voided', { position: 'top-center' });
+      router.refresh();
+    } else {
+      toast.error(`Failed to void invoice: ${result.error}`, {
         position: 'top-center',
       });
     }
+    setMenuOpen(false);
   }
 
   const statusStyles: Record<string, string> = {
     paid: 'bg-emerald-100 text-emerald-700',
     unpaid: 'bg-amber-100 text-amber-700',
-    overdue: 'bg-red-100 text-red-700',
+    overdue: 'bg-red-200 text-red-700',
     draft: 'bg-blue-50 text-blue-700',
+    void: 'bg-red-50 text-red-700',
   };
 
   return (
-    <div className="relative grid max-w-full grid-cols-[auto_1fr_1fr_1fr_1fr_1fr_1fr_1fr] items-center justify-between gap-x-3 rounded-lg border border-stone-100 bg-white px-5 py-5 shadow-sm transition-all hover:border-stone-300 hover:shadow-md">
+    <div className="relative mb-4 grid max-w-full grid-cols-[auto_1fr_1fr_1fr_1fr_1fr_1fr_1fr] items-center justify-between gap-x-3 rounded-lg border border-stone-100 bg-white px-5 py-5 shadow-sm transition-all hover:border-stone-300 hover:shadow-md">
       {/*Invoice Number*/}
       <div className="col-span1 col-start-1">
-        <p className="text-xs text-stone-400">{invoice.inv_num}</p>
+        <p className="text-xs text-stone-400">#{invoice.inv_num}</p>
       </div>
       {/*Client name and email*/}
       <div className="col-span-2 col-start-2">
         <p>{invoice.client_name}</p>
         <p className="hidden text-xs text-stone-400 md:block">
-          {invoice.clients?.email ?? 'No email'}
+          {invoice.client_email ?? 'No email'}
         </p>
       </div>
       {/*amount and date*/}
@@ -122,7 +113,13 @@ export default function InvoiceRow({ invoice }: InvoiceRowProps) {
         >
           <Bars3Icon />
         </Button>
-        {menuOpen && <ActionButton onDelete={handleDelete} />}
+        {menuOpen && (
+          <ActionButton
+            onVoid={handleVoid}
+            invoiceId={invoice.id}
+            status={invoice.status}
+          />
+        )}
       </div>
     </div>
   );

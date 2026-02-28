@@ -2,16 +2,16 @@ import { CardContent, Card, CardHeader, CardTitle } from './ui/card';
 
 type StatCard = {
   title: string;
-  invoice: string;
+  stat: string;
 };
 
-export default function InvoiceCard({ title, invoice }: StatCard) {
+export default function StatCard({ title, stat }: StatCard) {
   return (
     <Card className="mx-auto w-full max-w-sm">
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
-      <CardContent>{invoice}</CardContent>
+      <CardContent>{stat}</CardContent>
     </Card>
   );
 }

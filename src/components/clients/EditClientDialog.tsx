@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { clientSchema, ClientFormData } from '@/lib/schemas';
-import { createNewClient } from '@/lib/actions';
+import { updateClient } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,28 +16,21 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { PlusIcon } from '@heroicons/react/24/outline';
 import { toast } from 'sonner';
 
-type CreateClientDialogProps = {
-  onClientCreated?: (client: {
+type EditClientDialogProps = {
+  client: {
     id: string;
     name: string;
     email: string;
-  }) => void;
-  variant?:
-    | 'outline'
-    | 'default'
-    | 'link'
-    | 'destructive'
-    | 'secondary'
-    | 'ghost';
+  };
+  className: string;
 };
 
-export default function CreateClientDialog({
-  onClientCreated,
-  variant = 'outline',
-}: CreateClientDialogProps) {
+export default function EditClientDialog({
+  client,
+  className,
+}: EditClientDialogProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -48,35 +41,42 @@ export default function CreateClientDialog({
     formState: { errors, isSubmitting },
   } = useForm<ClientFormData>({
     resolver: zodResolver(clientSchema),
+    defaultValues: {
+      name: client.name,
+      email: client.email,
+    },
   });
 
   async function onSubmit(data: ClientFormData) {
-    const result = await createNewClient(data);
+    const result = await updateClient(client.id, data);
 
-    if (result.success && result.client) {
-      toast.success('Client created successfully', { position: 'top-center' });
-      onClientCreated?.(result.client);
-      reset();
+    if (result.success) {
+      toast.success('Client updated successfully', { position: 'top-center' });
       setOpen(false);
       router.refresh();
     } else {
-      toast.error(`Failed to create client: ${result.error}`, {
+      toast.error(`Failed to update client: ${result.error}`, {
         position: 'top-center',
       });
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        setOpen(isOpen);
+        if (isOpen) {
+          reset({ name: client.name, email: client.email });
+        }
+      }}
+    >
       <DialogTrigger asChild>
-        <Button type="button" variant={variant} size="sm">
-          <PlusIcon className="h-4 w-4" />
-          <span className="ml-1">New</span>
-        </Button>
+        <span className={className}>Edit</span>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add New Client</DialogTitle>
+          <DialogTitle>Edit Client</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
@@ -99,15 +99,12 @@ export default function CreateClientDialog({
             <Button
               type="button"
               variant="outline"
-              onClick={() => {
-                reset();
-                setOpen(false);
-              }}
+              onClick={() => setOpen(false)}
             >
               Cancel
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : 'Save Client'}
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>
         </form>

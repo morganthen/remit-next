@@ -15,12 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import CreateClientDialog from '@/components/clients/CreateClientDialog';
-
-type Client = {
-  id: string;
-  name: string;
-  email: string;
-};
+import { Client } from '@/lib/types';
 
 type InvoiceFormProps = {
   clients: Client[];
@@ -49,11 +44,22 @@ export default function InvoiceForm({
     },
   });
 
+  function handleClientSelected(clientId: string) {
+    const selected = clients.find((c) => c.id === clientId);
+    if (selected) {
+      setValue('client_id', selected.id);
+      setValue('client_name', selected.name);
+      setValue('client_email', selected.email);
+    }
+  }
+
   function handleClientCreated(client: Client) {
     setClients((prev) =>
       [...prev, client].sort((a, b) => a.name.localeCompare(b.name))
     );
     setValue('client_id', client.id);
+    setValue('client_name', client.name);
+    setValue('client_email', client.email);
   }
 
   return (
@@ -71,7 +77,7 @@ export default function InvoiceForm({
         <Label>Client</Label>
         <div className="flex items-center gap-2">
           <div className="flex-1">
-            <Select onValueChange={(value) => setValue('client_id', value)}>
+            <Select onValueChange={handleClientSelected}>
               <SelectTrigger>
                 <SelectValue placeholder="Select a client" />
               </SelectTrigger>
@@ -101,6 +107,7 @@ export default function InvoiceForm({
           type="number"
           step="0.01"
           placeholder="0.00"
+          min="0"
           {...register('amount')}
         />
         {errors.amount && (

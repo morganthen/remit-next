@@ -1,34 +1,43 @@
 import { ClientFormData, InvoiceFormData } from './schemas';
 import { createClient } from './supabase/client';
 
-export async function deleteInvoice(
+export async function voidInvoice(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
   try {
-    // request deleted row back so we can inspect response
+    const supabase = createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    console.log('Voiding invoice:', { id, userId: user?.id });
+
+    if (!user) return { success: false, error: 'Not authenticated' };
+
     const { data, error } = await supabase
       .from('invoices')
-      .delete()
+      .update({ status: 'void' })
       .eq('id', id)
+      .eq('user_id', user.id)
       .select();
 
-    console.log('supabase.delete response:', { id, data, error });
+    console.log('Void result:', { data, error });
 
     if (error) {
-      console.error(error);
-      throw new Error('Invoice could not be deleted');
+      console.error('Supabase error:', error);
+      return { success: false, error: error.message };
     }
-    // if no rows returned, log that too
-    if (!data || (Array.isArray(data) && data.length === 0)) {
-      console.warn('Delete returned no rows for id:', id);
+
+    if (!data || data.length === 0) {
+      return { success: false, error: 'Invoice not found or not owned by you' };
     }
 
     return { success: true };
   } catch (e) {
     const errorMessage =
       e instanceof Error ? e.message : 'An unknown error occurred';
-    console.error('Delete invoice failed', errorMessage);
+    console.error('Void invoice exception:', errorMessage);
     return { success: false, error: errorMessage };
   }
 }
@@ -75,17 +84,6 @@ export async function createInvoice(
 
   if (!user) return { success: false, error: 'Not authenticated' };
 
-  // Look up client name from client_id
-  const { data: client, error: clientError } = await supabase
-    .from('clients')
-    .select('name')
-    .eq('id', invoiceData.client_id)
-    .single();
-
-  if (clientError || !client) {
-    return { success: false, error: 'Client not found' };
-  }
-
   // Get next invoice number
   const { data: lastInvoice } = await supabase
     .from('invoices')
@@ -98,8 +96,8 @@ export async function createInvoice(
     lastInvoice && lastInvoice.length > 0 ? lastInvoice[0].inv_num + 1 : 1;
 
   const { error } = await supabase.from('invoices').insert({
-    client_id: invoiceData.client_id,
-    client_name: client.name,
+    client_name: invoiceData.client_name,
+    client_email: invoiceData.client_email,
     amount: invoiceData.amount,
     due_date: invoiceData.due_date,
     status: invoiceData.status,
@@ -110,6 +108,88 @@ export async function createInvoice(
   if (error) {
     console.error('Create invoice failed:', error);
     return { success: false, error: error.message };
+  }
+
+  return { success: true };
+}
+
+export async function updateClient(
+  clientId: string,
+  clientData: ClientFormData
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { success: false, error: 'Not authenticated' };
+
+  const { error } = await supabase
+    .from('clients')
+    .update({
+      name: clientData.name,
+      email: clientData.email,
+    })
+    .eq('id', clientId)
+    .eq('user_id', user.id);
+
+  if (error) {
+    console.error('Update client failed:', error);
+    return { success: false, error: error.message };
+  }
+
+  return { success: true };
+}
+
+export async function deleteClient(
+  clientId: string
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { success: false, error: 'Not authenticated' };
+
+  const { error } = await supabase
+    .from('clients')
+    .delete()
+    .eq('id', clientId)
+    .eq('user_id', user.id);
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  return { success: true };
+}
+
+export async function markInvoicePaid(
+  id: string
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { success: false, error: 'Not authenticated' };
+
+  const { data, error } = await supabase
+    .from('invoices')
+    .update({ status: 'paid' })
+    .eq('id', id)
+    .eq('user_id', user.id)
+    .select();
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  if (!data || data.length === 0) {
+    return { success: false, error: 'Invoice not found or not owned by you' };
   }
 
   return { success: true };
