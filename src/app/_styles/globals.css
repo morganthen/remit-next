@@ -1,6 +1,6 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -122,5 +122,37 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@media print {
+  @page {
+    margin: 0.5cm;
+  }
+  body * {
+    visibility: hidden;
+  }
+  #invoice-card,
+  #invoice-card * {
+    visibility: visible;
+  }
+  #invoice-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    border: none;
+    box-shadow: none;
+    padding: 24px; /* controlled padding instead of inheriting p-8 */
+  }
+  /* Remove min-h-screen from the outer wrapper */
+  body {
+    min-height: unset !important;
+  }
+  /* Prevent blank second page */
+  html,
+  body {
+    height: auto !important;
+    overflow: hidden !important;
   }
 }

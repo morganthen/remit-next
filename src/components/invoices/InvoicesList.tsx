@@ -1,5 +1,5 @@
 import InvoiceRow from './InvoiceRow';
-import { getInvoices } from '@/lib/data';
+import { getInvoices, getClients } from '@/lib/data';
 
 export default async function InvoicesList({
   showVoid,
@@ -10,13 +10,16 @@ export default async function InvoicesList({
   status: string;
   search: string;
 }) {
-  const invoices = await getInvoices({ showVoid, status, search });
+  const [invoices, clients] = await Promise.all([
+    getInvoices({ showVoid, status, search }),
+    getClients(), // still needed for the edit form dropdown
+  ]);
 
   return (
     <ul>
       {invoices.map((invoice) => (
         <li key={invoice.id}>
-          <InvoiceRow invoice={invoice} />
+          <InvoiceRow invoice={invoice} clients={clients} />
         </li>
       ))}
     </ul>

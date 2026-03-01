@@ -1,6 +1,6 @@
 import { cache } from 'react';
 import { createClient } from './supabase/server';
-import { Invoice, Client } from './types';
+import { Invoice, Client, Settings } from './types';
 
 // creates client and gets user once and cached
 const getSupabaseWithUser = cache(async () => {
@@ -58,6 +58,18 @@ export async function getInvoices({
     throw new Error("There's an error getting invoices");
   }
   return (data ?? []) as unknown as Invoice[];
+}
+
+export async function getInvoiceCount(): Promise<number> {
+  const { supabase, user } = await getSupabaseWithUser();
+
+  const { count, error } = await supabase
+    .from('invoices')
+    .select('*', { count: 'exact', head: true }) // head:true means no rows returned, just the count
+    .eq('user_id', user.id);
+
+  if (error) return 0;
+  return count ?? 0;
 }
 
 export async function getRecentInvoices(): Promise<Invoice[]> {
@@ -170,4 +182,17 @@ export async function getInvoiceById(id: string): Promise<Invoice | null> {
 
   if (error || !data) return null;
   return data as Invoice;
+}
+
+export async function getSettings(): Promise<Settings | null> {
+  const { supabase, user } = await getSupabaseWithUser();
+
+  const { data, error } = await supabase
+    .from('settings')
+    .select('*')
+    .eq('user_id', user.id)
+    .single();
+
+  if (error || !data) return null;
+  return data as Settings;
 }

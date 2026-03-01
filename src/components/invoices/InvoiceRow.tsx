@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { Invoice } from '@/lib/types';
+import { Invoice, Client } from '@/lib/types';
 import { Button } from '../ui/button';
 import { Bars3Icon } from '@heroicons/react/24/outline';
 import { capitalize } from '@/lib/utils';
@@ -10,13 +10,16 @@ import { markInvoiceOverdue, voidInvoice } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import ActionButton from './ActionButton';
+import EditInvoiceDialog from './EditInvoiceDialog';
 
 type InvoiceRowProps = {
   invoice: Invoice;
+  clients: Client[];
 };
 
-export default function InvoiceRow({ invoice }: InvoiceRowProps) {
+export default function InvoiceRow({ invoice, clients }: InvoiceRowProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -137,8 +140,20 @@ export default function InvoiceRow({ invoice }: InvoiceRowProps) {
             invoiceId={invoice.id}
             status={invoice.status}
             invoice={invoice}
+            clients={clients}
+            onEdit={() => {
+              setMenuOpen(false); // close menu
+              setEditOpen(true); // open dialog
+            }}
           />
         )}
+
+        <EditInvoiceDialog
+          invoice={invoice}
+          clients={clients}
+          open={editOpen}
+          onOpenChange={setEditOpen}
+        />
       </div>
     </div>
   );

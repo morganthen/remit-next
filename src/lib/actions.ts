@@ -1,11 +1,13 @@
-import { ClientFormData, InvoiceFormData } from './schemas';
-import { createClient } from './supabase/client';
+'use server';
+import { revalidatePath } from 'next/cache';
+import { ClientFormData, InvoiceFormData, SettingsFormData } from './schemas';
+import { createClient } from './supabase/server';
 
 export async function voidInvoice(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const {
       data: { user },
@@ -47,7 +49,7 @@ export async function createNewClient(clientData: ClientFormData): Promise<{
   error?: string;
   client?: { id: string; name: string; email: string };
 }> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },
@@ -76,7 +78,7 @@ export async function createNewClient(clientData: ClientFormData): Promise<{
 export async function createInvoice(
   invoiceData: InvoiceFormData
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },
@@ -113,11 +115,43 @@ export async function createInvoice(
   return { success: true };
 }
 
+export async function updateInvoice(
+  invoiceId: string,
+  invoiceData: InvoiceFormData
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { success: false, error: 'Not authenticated' };
+
+  const { error } = await supabase
+    .from('invoices')
+    .update({
+      client_name: invoiceData.client_name,
+      client_email: invoiceData.client_email,
+      amount: invoiceData.amount,
+      due_date: invoiceData.due_date,
+      status: invoiceData.status,
+    })
+    .eq('id', invoiceId)
+    .eq('user_id', user.id);
+
+  if (error) {
+    console.error('Update invoice failed:', error);
+    return { success: false, error: error.message };
+  }
+
+  return { success: true };
+}
+
 export async function updateClient(
   clientId: string,
   clientData: ClientFormData
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },
@@ -145,7 +179,7 @@ export async function updateClient(
 export async function deleteClient(
   clientId: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },
@@ -169,7 +203,7 @@ export async function deleteClient(
 export async function markInvoicePaid(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },
@@ -198,7 +232,7 @@ export async function markInvoicePaid(
 export async function markInvoiceUnpaid(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },
@@ -225,7 +259,7 @@ export async function markInvoiceUnpaid(
 }
 
 export async function markInvoiceOverdue(id: string): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -235,4 +269,35 @@ export async function markInvoiceOverdue(id: string): Promise<void> {
     .update({ status: 'overdue' })
     .eq('id', id)
     .eq('user_id', user.id);
+}
+
+export async function upsertSettings(
+  data: SettingsFormData
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { success: false, error: 'Not authenticated' };
+
+  const { error } = await supabase.from('settings').upsert(
+    {
+      user_id: user.id,
+      ...data,
+    },
+    {
+      onConflict: 'user_id',
+      ignoreDuplicates: false, // ← always update if exists
+    }
+  );
+
+  if (error) {
+    console.error('Upsert settings failed:', error);
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath('/overview/settings');
+  return { success: true };
 }

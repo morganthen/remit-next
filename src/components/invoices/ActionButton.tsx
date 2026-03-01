@@ -14,19 +14,26 @@ import { toast } from 'sonner';
 import { markInvoicePaid, markInvoiceUnpaid } from '@/lib/actions';
 import { Invoice } from '@/lib/types';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import EditInvoiceDialog from './EditInvoiceDialog';
+import { Client } from '@/lib/types';
 
 type ActionButtonProps = {
   onVoid: () => Promise<void>;
+  onEdit: () => void;
   invoiceId: string;
   status: string;
   invoice: Invoice;
+  clients: Client[];
 };
 
 export default function ActionButton({
   onVoid,
+  onEdit,
   invoiceId,
   status,
   invoice,
+  clients,
 }: ActionButtonProps) {
   const [open, setOpen] = useState(false);
   const [isVoiding, setIsVoiding] = useState(false);
@@ -69,16 +76,22 @@ export default function ActionButton({
 
   return (
     <div className="absolute top-full right-0 z-10 mt-1 flex w-36 flex-col items-center justify-center rounded-md border border-stone-200 bg-white shadow-md">
-      <button className="w-full border-b border-stone-300 px-4 py-2 text-sm hover:bg-stone-50">
+      <Link
+        href={`/overview/invoices/${invoice.id}`}
+        className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50"
+      >
         View Invoice
-      </button>
-      <button className="w-full border-b border-stone-300 px-4 py-2 text-sm hover:bg-stone-50">
+      </Link>
+      <button
+        className="w-full border-b border-stone-300 px-4 py-2 text-sm hover:bg-stone-50"
+        onClick={onEdit} // ← just call onEdit
+      >
         Edit
       </button>
 
       {invoice.client_email && invoice.status !== 'paid' && (
         <a
-          href={`mailto:${invoice.client_email}?subject=Invoice %23${invoice.inv_num}&body=Please find attached invoice %23${invoice.inv_num}. It was a pleasure doing business with you`}
+          href={`mailto:${invoice.client_email}?subject=Invoice %23${invoice.inv_num}&body=Please find your invoice here: ${process.env.NEXT_PUBLIC_APP_URL}/invoice/${invoice.id}%0A%0AIt was a pleasure doing business with you.`}
           className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50"
         >
           Email Client
@@ -87,7 +100,7 @@ export default function ActionButton({
 
       {invoice.client_email && invoice.status === 'overdue' && (
         <a
-          href={`mailto:${invoice.client_email}?subject=Invoice %23${invoice.inv_num}&body=This is a friendly reminder that invoice %23${invoice.inv_num} is overdue.`}
+          href={`mailto:${invoice.client_email}?subject=Reminder: Invoice %23${invoice.inv_num}&body=This is a friendly reminder that invoice %23${invoice.inv_num} is overdue.%0A%0AYou can view it here: ${process.env.NEXT_PUBLIC_APP_URL}/invoice/${invoice.id}`}
           className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50"
         >
           Send Reminder
@@ -96,7 +109,7 @@ export default function ActionButton({
 
       {invoice.client_email && invoice.status === 'paid' && (
         <a
-          href={`mailto:${invoice.client_email}?subject=Invoice %23${invoice.inv_num}&body=This email is acknowledge the receipt of invoice %23${invoice.inv_num}. Thank you!`}
+          href={`mailto:${invoice.client_email}?subject=Receipt: Invoice %23${invoice.inv_num}&body=This email acknowledges receipt of invoice %23${invoice.inv_num}. Thank you!%0A%0AYou can view it here: ${process.env.NEXT_PUBLIC_APP_URL}/invoice/${invoice.id}`}
           className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50"
         >
           Send Receipt

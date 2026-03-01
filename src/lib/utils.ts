@@ -31,15 +31,15 @@ export function averageInvoiceAmount(invoices: { amount: number }[]): number {
 export function rollingAverageIncome(invoices: Invoice[]): number {
   const now = new Date();
   const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(now.getDate() - 6); // includes today
+  sevenDaysAgo.setDate(now.getDate() - 6);
+  sevenDaysAgo.setHours(0, 0, 0, 0); // start of day 7 days ago
 
-  // Filter invoices: paid and created_at in last 7 days
-  const recent = invoices.filter(
-    (inv) =>
-      inv.status === 'paid' &&
-      new Date(inv.created_at) >= sevenDaysAgo &&
-      new Date(inv.created_at) <= now
-  );
+  const recent = invoices.filter((inv) => {
+    const createdAt = new Date(inv.created_at);
+    return (
+      inv.status === 'paid' && createdAt >= sevenDaysAgo && createdAt <= now
+    );
+  });
 
   if (!recent.length) return 0;
 
