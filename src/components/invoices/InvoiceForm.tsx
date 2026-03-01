@@ -108,7 +108,7 @@ export default function InvoiceForm({
           step="0.01"
           placeholder="0.00"
           min="0"
-          {...register('amount')}
+          {...register('amount', { valueAsNumber: true })}
         />
         {errors.amount && (
           <p className="mt-1 text-xs text-red-500">{errors.amount.message}</p>
