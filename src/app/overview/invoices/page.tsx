@@ -3,14 +3,21 @@ import InvoicesList from '@/components/invoices/InvoicesList';
 import CreateInvoiceButtonWrapper from '@/components/invoices/CreateInvoiceButtonWrapper';
 import ShowVoidToggle from '@/components/invoices/ShowVoidToggle';
 import { InvoicesListSkeleton } from '@/components/invoices/InvoicesListSkeleton';
+import FilterBar from '@/components/FilterBar';
 
 export default async function InvoicesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ showVoid?: string }>;
+  searchParams: Promise<{
+    showVoid?: string;
+    status?: string;
+    search?: string;
+  }>;
 }) {
   const params = await searchParams;
   const showVoid = params.showVoid === 'true';
+  const status = params.status ?? 'all';
+  const search = params.search ?? '';
 
   return (
     <div className="mb-12 flex flex-col items-center justify-center px-8 md:mx-auto md:max-w-3xl">
@@ -22,8 +29,12 @@ export default async function InvoicesPage({
           <ShowVoidToggle />
         </div>
       </div>
-      <Suspense key={String(showVoid)} fallback={<InvoicesListSkeleton />}>
-        <InvoicesList showVoid={showVoid} />
+      <FilterBar status={status} search={search} />
+      <Suspense
+        key={`${showVoid}-${status}-${search}`}
+        fallback={<InvoicesListSkeleton />}
+      >
+        <InvoicesList showVoid={showVoid} status={status} search={search} />
       </Suspense>
       <Suspense fallback={null}>
         <CreateInvoiceButtonWrapper className="fixed right-5 bottom-20 rounded-full shadow-lg md:right-8 md:bottom-10 md:h-12 md:w-12" />

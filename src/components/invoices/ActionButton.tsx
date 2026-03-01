@@ -26,6 +26,7 @@ export default function ActionButton({
   onVoid,
   invoiceId,
   status,
+  invoice,
 }: ActionButtonProps) {
   const [open, setOpen] = useState(false);
   const [isVoiding, setIsVoiding] = useState(false);
@@ -74,6 +75,34 @@ export default function ActionButton({
       <button className="w-full border-b border-stone-300 px-4 py-2 text-sm hover:bg-stone-50">
         Edit
       </button>
+
+      {invoice.client_email && invoice.status !== 'paid' && (
+        <a
+          href={`mailto:${invoice.client_email}?subject=Invoice %23${invoice.inv_num}&body=Please find attached invoice %23${invoice.inv_num}. It was a pleasure doing business with you`}
+          className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50"
+        >
+          Email Client
+        </a>
+      )}
+
+      {invoice.client_email && invoice.status === 'overdue' && (
+        <a
+          href={`mailto:${invoice.client_email}?subject=Invoice %23${invoice.inv_num}&body=This is a friendly reminder that invoice %23${invoice.inv_num} is overdue.`}
+          className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50"
+        >
+          Send Reminder
+        </a>
+      )}
+
+      {invoice.client_email && invoice.status === 'paid' && (
+        <a
+          href={`mailto:${invoice.client_email}?subject=Invoice %23${invoice.inv_num}&body=This email is acknowledge the receipt of invoice %23${invoice.inv_num}. Thank you!`}
+          className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50"
+        >
+          Send Receipt
+        </a>
+      )}
+
       {status !== 'paid' && status !== 'draft' && (
         <button
           className="w-full border-b border-stone-300 px-4 py-2 text-sm text-green-600 hover:bg-stone-50"

@@ -8,15 +8,16 @@ type NavLinkWithIconProps = {
   icon?: ComponentType<SVGProps<SVGSVGElement>>;
   isActive?: boolean;
   className?: string;
+  onClick?: () => void;
 };
 
-// ✅ Used for navigation: sidebar links
 export function NavLinkWithIcon({
   href,
   children,
   icon: Icon,
   isActive,
   className,
+  onClick,
 }: NavLinkWithIconProps) {
   return (
     <Button
@@ -25,7 +26,7 @@ export function NavLinkWithIcon({
       size="responsive"
       className={`${isActive ? 'bg-stone-200 text-stone-800' : ''} ${className}`}
     >
-      <Link href={href}>
+      <Link href={href} onClick={onClick}>
         {/* Fixed width icon container so all icons line up */}
         <div className="flex md:w-24 md:justify-between">
           <span className="shrink-0 md:flex md:w-4 md:items-center md:justify-center">

@@ -14,30 +14,41 @@ const getSupabaseWithUser = cache(async () => {
   return { supabase, user };
 });
 
-export async function getInvoices(
-  showVoid: boolean = false
-): Promise<Invoice[]> {
+export async function getInvoices({
+  showVoid = false,
+  status = 'all',
+  search = '',
+}: {
+  showVoid?: boolean;
+  status?: string;
+  search?: string;
+} = {}) {
   const { supabase, user } = await getSupabaseWithUser();
 
   let query = supabase
     .from('invoices')
-    .select(
-      `
-      id,
-      amount,
-      due_date,
-      status,
-      created_at,
-      inv_num,
-      client_name,
-      client_email
-    `
-    )
+    .select(`*`)
     .eq('user_id', user.id)
     .order('inv_num', { ascending: false });
 
   if (!showVoid) {
     query = query.neq('status', 'void');
+  }
+
+  if (status !== 'all') {
+    query = query.eq('status', status);
+  }
+
+  if (search) {
+    // Check if search looks like a number — if so, filter by inv_num directly
+    const searchAsNumber = parseInt(search, 10);
+    if (!isNaN(searchAsNumber)) {
+      query = query.or(
+        `client_name.ilike.%${search}%,inv_num.eq.${searchAsNumber}`
+      );
+    } else {
+      query = query.ilike('client_name', `%${search}%`);
+    }
   }
 
   const { data, error } = await query;

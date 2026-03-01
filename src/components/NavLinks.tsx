@@ -8,6 +8,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { usePathname } from 'next/navigation';
 import { NavLinkWithIcon } from '@/components/NavLinkWithIcon'; // ✅
+import { useState } from 'react';
 
 const links = [
   { name: 'Overview', href: '/overview', icon: HomeIcon },
@@ -22,6 +23,10 @@ const links = [
 
 export default function NavLinks() {
   const pathname = usePathname();
+  const [optimisticPath, setOptimisticPath] = useState<string | null>(null);
+
+  const activePath = optimisticPath ?? pathname;
+
   return (
     <>
       {links.map((link) => (
@@ -29,8 +34,8 @@ export default function NavLinks() {
           key={link.name}
           href={link.href}
           icon={link.icon}
-          isActive={pathname === link.href}
-          className=""
+          isActive={activePath === link.href}
+          onClick={() => setOptimisticPath(link.href)}
         >
           {link.name}
         </NavLinkWithIcon>
