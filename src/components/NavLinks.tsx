@@ -36,6 +36,7 @@ export default function NavLinks() {
           icon={link.icon}
           isActive={activePath === link.href}
           onClick={() => setOptimisticPath(link.href)}
+          className="h-12 w-18"
         >
           {link.name}
         </NavLinkWithIcon>

@@ -8,7 +8,7 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="bg-stone-0 h-screen text-stone-700 md:grid md:grid-cols-[10rem_1fr] md:grid-rows-[auto_1fr] lg:grid-cols-[16rem_1fr]">
-      <aside className="fixed inset-x-0 bottom-0 z-30 h-14 md:static md:row-span-2 md:h-full md:border-r md:border-stone-200">
+      <aside className="fixed inset-x-0 bottom-0 z-30 h-18 md:static md:row-span-2 md:h-full md:border-r md:border-stone-200">
         <SideNav />
       </aside>
 
