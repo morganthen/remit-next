@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import InvoiceRow from './InvoiceRow';
-import { getClients, getRecentInvoices } from '@/lib/data';
+import { getClients, getRecentInvoices, getSettings } from '@/lib/data';
 
 export default async function RecentInvoices() {
-  const [recentInvoices, clients] = await Promise.all([
+  const [recentInvoices, clients, settings] = await Promise.all([
     getRecentInvoices(),
     getClients(),
+    getSettings(),
   ]);
 
   return (
@@ -27,7 +28,11 @@ export default async function RecentInvoices() {
         <ul>
           {recentInvoices.map((invoice) => (
             <li key={invoice.id}>
-              <InvoiceRow invoice={invoice} clients={clients} />
+              <InvoiceRow
+                invoice={invoice}
+                clients={clients}
+                settings={settings}
+              />
             </li>
           ))}
         </ul>

@@ -26,8 +26,8 @@ export default async function Header() {
       {/* Right: Username, Theme, Sign Out */}
       <div className="flex items-center gap-4">
         <p className="text-sm">
-          <span className="hidden md:inline">Welcome</span>
-          {settings?.business_name ? `, ${settings.business_name}` : ''}
+          <span className="hidden md:inline">Welcome,</span>
+          {settings?.business_name ? ` ${settings.business_name}` : ''}
         </p>
         <ButtonWithIcon icon={MoonIcon} variant="outline"></ButtonWithIcon>
         <form action={logout}>

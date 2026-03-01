@@ -196,3 +196,38 @@ export async function getSettings(): Promise<Settings | null> {
   if (error || !data) return null;
   return data as Settings;
 }
+
+// Public functions — no auth required, used for shareable invoice links
+export async function getPublicInvoiceById(
+  id: string
+): Promise<Invoice | null> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('invoices')
+    .select(
+      'id, user_id, amount, due_date, status, created_at, inv_num, client_name, client_email'
+    )
+    .eq('id', id)
+    .single();
+
+  if (error || !data) return null;
+  return data as unknown as Invoice;
+}
+
+export async function getPublicSettingsByUserId(
+  userId: string
+): Promise<Settings | null> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('settings')
+    .select(
+      'business_name, business_email, business_phone, business_address, payment_bank_name, payment_account_name, payment_account_number, payment_bsb, payment_notes'
+    )
+    .eq('user_id', userId)
+    .single();
+
+  if (error || !data) return null;
+  return data as unknown as Settings;
+}

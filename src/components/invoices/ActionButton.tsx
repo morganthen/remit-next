@@ -12,11 +12,9 @@ import { useState } from 'react';
 import { Button } from '../ui/button';
 import { toast } from 'sonner';
 import { markInvoicePaid, markInvoiceUnpaid } from '@/lib/actions';
-import { Invoice } from '@/lib/types';
+import { Invoice, Settings } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import EditInvoiceDialog from './EditInvoiceDialog';
-import { Client } from '@/lib/types';
 
 type ActionButtonProps = {
   onVoid: () => Promise<void>;
@@ -24,7 +22,7 @@ type ActionButtonProps = {
   invoiceId: string;
   status: string;
   invoice: Invoice;
-  clients: Client[];
+  settings: Settings | null;
 };
 
 export default function ActionButton({
@@ -33,13 +31,41 @@ export default function ActionButton({
   invoiceId,
   status,
   invoice,
-  clients,
+  settings,
 }: ActionButtonProps) {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  const invoiceUrl = `${appUrl}/invoice/${invoice.id}`;
+
+  function buildMailBody(
+    template: string | null | undefined,
+    fallback: string
+  ): string {
+    const greeting = `Hi ${invoice.client_name},\n\n`;
+    const body = `${greeting}${template || fallback}\n\nYou can view the invoice here: ${invoiceUrl}`;
+    return encodeURIComponent(body);
+  }
   const [open, setOpen] = useState(false);
   const [isVoiding, setIsVoiding] = useState(false);
   const [isPaying, setIsPaying] = useState(false);
   const [isUnpaying, setIsUnpaying] = useState(false);
+  const [isEmailing, setIsEmailing] = useState(false);
   const router = useRouter();
+
+  async function handleEmailClient(mailtoUrl: string) {
+    if (invoice.status === 'draft') {
+      setIsEmailing(true);
+      const result = await markInvoiceUnpaid(invoiceId);
+      if (result.success) {
+        router.refresh();
+      } else {
+        toast.error(result.error ?? 'Failed to update invoice status');
+        setIsEmailing(false);
+        return; // don't open mailto if update failed
+      }
+      setIsEmailing(false);
+    }
+    window.location.href = mailtoUrl;
+  }
 
   async function handleMarkUnpaid() {
     setIsUnpaying(true);
@@ -89,18 +115,25 @@ export default function ActionButton({
         Edit
       </button>
 
-      {invoice.client_email && invoice.status !== 'paid' && (
-        <a
-          href={`mailto:${invoice.client_email}?subject=Invoice %23${invoice.inv_num}&body=Please find your invoice here: ${process.env.NEXT_PUBLIC_APP_URL}/invoice/${invoice.id}%0A%0AIt was a pleasure doing business with you.`}
-          className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50"
-        >
-          Email Client
-        </a>
-      )}
+      {invoice.client_email &&
+        invoice.status !== 'paid' &&
+        invoice.status !== 'overdue' && (
+          <button
+            onClick={() =>
+              handleEmailClient(
+                `mailto:${invoice.client_email}?subject=Invoice %23${invoice.inv_num}&body=${buildMailBody(settings?.email_new_invoice, 'Please find your invoice attached. Do not hesitate to reach out if you have any questions.')}`
+              )
+            }
+            disabled={isEmailing}
+            className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50 disabled:opacity-50"
+          >
+            {isEmailing ? 'Sending...' : 'Email Client'}
+          </button>
+        )}
 
       {invoice.client_email && invoice.status === 'overdue' && (
         <a
-          href={`mailto:${invoice.client_email}?subject=Reminder: Invoice %23${invoice.inv_num}&body=This is a friendly reminder that invoice %23${invoice.inv_num} is overdue.%0A%0AYou can view it here: ${process.env.NEXT_PUBLIC_APP_URL}/invoice/${invoice.id}`}
+          href={`mailto:${invoice.client_email}?subject=Reminder: Invoice %23${invoice.inv_num}&body=${buildMailBody(settings?.email_overdue_reminder, 'This is a friendly reminder that your invoice is now overdue. Please arrange payment at your earliest convenience.')}`}
           className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50"
         >
           Send Reminder
@@ -109,7 +142,7 @@ export default function ActionButton({
 
       {invoice.client_email && invoice.status === 'paid' && (
         <a
-          href={`mailto:${invoice.client_email}?subject=Receipt: Invoice %23${invoice.inv_num}&body=This email acknowledges receipt of invoice %23${invoice.inv_num}. Thank you!%0A%0AYou can view it here: ${process.env.NEXT_PUBLIC_APP_URL}/invoice/${invoice.id}`}
+          href={`mailto:${invoice.client_email}?subject=Receipt: Invoice %23${invoice.inv_num}&body=${buildMailBody(settings?.email_receipt, 'Thank you for your payment. This email confirms receipt of your payment in full.')}`}
           className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50"
         >
           Send Receipt

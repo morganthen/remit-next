@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { Invoice, Client } from '@/lib/types';
+import { Invoice, Client, Settings } from '@/lib/types';
 import { Button } from '../ui/button';
 import { Bars3Icon } from '@heroicons/react/24/outline';
 import { capitalize } from '@/lib/utils';
@@ -15,9 +15,14 @@ import EditInvoiceDialog from './EditInvoiceDialog';
 type InvoiceRowProps = {
   invoice: Invoice;
   clients: Client[];
+  settings: Settings | null;
 };
 
-export default function InvoiceRow({ invoice, clients }: InvoiceRowProps) {
+export default function InvoiceRow({
+  invoice,
+  clients,
+  settings,
+}: InvoiceRowProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const router = useRouter();
@@ -140,10 +145,10 @@ export default function InvoiceRow({ invoice, clients }: InvoiceRowProps) {
             invoiceId={invoice.id}
             status={invoice.status}
             invoice={invoice}
-            clients={clients}
+            settings={settings}
             onEdit={() => {
-              setMenuOpen(false); // close menu
-              setEditOpen(true); // open dialog
+              setMenuOpen(false);
+              setEditOpen(true);
             }}
           />
         )}

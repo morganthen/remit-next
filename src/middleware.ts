@@ -24,28 +24,59 @@ export async function middleware(request: NextRequest) {
       },
     }
   );
-  // Refresh the session — important for keeping auth alive
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const publicPaths = ['/login', '/signup'];
-  const isPublicPath = publicPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
-  );
+  const { pathname } = request.nextUrl;
 
-  // Not logged in and trying to access protected route → redirect to login
+  const publicPaths = ['/login', '/signup', '/invoice'];
+  const isPublicPath = publicPaths.some((path) => pathname.startsWith(path));
+
+  // Not logged in -> login page
   if (!user && !isPublicPath) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
   }
 
-  // Logged in and trying to access login/signup → redirect to home
+  // Logged in + trying to access login/signup -> root
   if (user && isPublicPath) {
     const url = request.nextUrl.clone();
     url.pathname = '/';
     return NextResponse.redirect(url);
+  }
+
+  // Logged in -> check if they have settings (i.e. completed onboarding)
+  if (user && !isPublicPath && pathname !== '/onboarding') {
+    const { data: settings } = await supabase
+      .from('settings')
+      .select('user_id')
+      .eq('user_id', user.id)
+      .single();
+
+    // No settings row then send to onboarding
+    if (!settings) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/onboarding';
+      return NextResponse.redirect(url);
+    }
+  }
+
+  // logged in + has settings + trying to visit onboarding → overview
+  if (user && pathname === '/onboarding') {
+    const { data: settings } = await supabase
+      .from('settings')
+      .select('user_id')
+      .eq('user_id', user.id)
+      .single();
+
+    if (settings) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/overview';
+      return NextResponse.redirect(url);
+    }
   }
 
   return supabaseResponse;
@@ -53,13 +84,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization)
-     * - favicon.ico
-     * - public assets (svg, png, jpg, etc.)
-     */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
