@@ -1,5 +1,7 @@
 import ClientsList from '@/components/clients/ClientList';
+import { ClientListSkeleton } from '@/components/clients/ClientListSkeleton';
 import CreateClientDialog from '@/components/clients/CreateClientDialog';
+import { Suspense } from 'react';
 
 export default async function Page() {
   return (
@@ -10,7 +12,9 @@ export default async function Page() {
         </h1>
         <CreateClientDialog variant="ghost" />
       </div>
-      <ClientsList />
+      <Suspense fallback={<ClientListSkeleton />}>
+        <ClientsList />
+      </Suspense>
     </div>
   );
 }

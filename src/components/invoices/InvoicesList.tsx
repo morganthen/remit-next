@@ -1,10 +1,16 @@
 import InvoiceRow from './InvoiceRow';
-import { Invoice } from '@/lib/types';
+import { getInvoices } from '@/lib/data';
 
-export default function InvoicesList({ invoices }: { invoices: Invoice[] }) {
+export default async function InvoicesList({
+  showVoid,
+}: {
+  showVoid: boolean;
+}) {
+  const invoices = await getInvoices(showVoid);
+
   return (
     <ul>
-      {invoices?.map((invoice) => (
+      {invoices.map((invoice) => (
         <li key={invoice.id}>
           <InvoiceRow invoice={invoice} />
         </li>

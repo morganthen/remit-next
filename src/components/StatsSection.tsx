@@ -1,19 +1,17 @@
-import { getTotalCollected, getTotalOwed } from '@/lib/data';
+import { getTotalCollected, getTotalOwed, getInvoices } from '@/lib/data';
 import StatCard from './StatCard';
 import {
   formatCurrency,
   averageInvoiceAmount,
   rollingAverageIncome,
 } from '@/lib/utils';
-import { Invoice } from '@/lib/types';
 
-export default async function StatsSection({
-  invoices,
-}: {
-  invoices: Invoice[];
-}) {
-  const totalCollected = await getTotalCollected();
-  const totalOwed = await getTotalOwed();
+export default async function StatsSection() {
+  const [invoices, totalCollected, totalOwed] = await Promise.all([
+    getInvoices(),
+    getTotalCollected(),
+    getTotalOwed(),
+  ]);
   const avg = averageInvoiceAmount(invoices);
 
   return (

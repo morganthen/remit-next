@@ -1,10 +1,11 @@
 'use client';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
-export default function ShowVoidToggle({ showVoid }: { showVoid: boolean }) {
+export default function ShowVoidToggle() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const showVoid = searchParams.get('showVoid') === 'true';
 
   function handleToggle() {
     const params = new URLSearchParams(searchParams.toString());
