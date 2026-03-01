@@ -2,16 +2,21 @@ import RecentInvoices from '@/components/invoices/RecentInvoices';
 import Link from 'next/link';
 import CreateInvoiceButton from '@/components/invoices/CreateInvoiceButton';
 import StatsSection from '@/components/StatsSection';
-import { getNextInvoiceNumber, getClients, getInvoices } from '@/lib/data';
+import {
+  getNextInvoiceNumber,
+  getClients,
+  getInvoices,
+  getRecentInvoices,
+} from '@/lib/data';
 
 export default async function Page() {
-  const [clients, nextInvoiceNumber, invoices] = await Promise.all([
-    getClients(),
-    getNextInvoiceNumber(),
-    getInvoices(),
-  ]);
-
-  console.log('invoices:', invoices);
+  const [clients, nextInvoiceNumber, invoices, recentInvoices] =
+    await Promise.all([
+      getClients(),
+      getNextInvoiceNumber(),
+      getInvoices(),
+      getRecentInvoices(),
+    ]);
 
   return (
     <div className="flex flex-col items-center justify-center px-8 md:mx-auto md:max-w-3xl">
@@ -33,9 +38,8 @@ export default async function Page() {
           </Link>
         )}
       </div>
-
       <div className="mb-10 flex w-full flex-col gap-3">
-        <RecentInvoices />
+        <RecentInvoices recentInvoices={recentInvoices} />
       </div>
       <CreateInvoiceButton
         clients={clients}

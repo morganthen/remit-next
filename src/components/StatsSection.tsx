@@ -15,7 +15,6 @@ export default async function StatsSection({
   const totalCollected = await getTotalCollected();
   const totalOwed = await getTotalOwed();
   const avg = averageInvoiceAmount(invoices);
-  console.log('Average Invoice:', avg);
 
   return (
     <div className="grid w-full max-w-3xl grid-cols-2 gap-3 md:gap-6">

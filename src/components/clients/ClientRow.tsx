@@ -57,7 +57,6 @@ export default function ClientRow({ client }: { client: Client }) {
   }, [menuOpen]);
 
   async function handleDelete() {
-    console.log('handleDelete Clicked');
     const result = await deleteClient(client.id);
     if (result.success) {
       toast.success('Client deleted');

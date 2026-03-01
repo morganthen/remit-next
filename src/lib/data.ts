@@ -1,8 +1,9 @@
+import { cache } from 'react';
 import { createClient } from './supabase/server';
 import { Invoice, Client } from './types';
 
-// creates client and gets user once (attempting to f)
-async function getSupabaseWithUser() {
+// creates client and gets user once and cached
+const getSupabaseWithUser = cache(async () => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -11,7 +12,7 @@ async function getSupabaseWithUser() {
   if (!user) throw new Error('Not authenticated');
 
   return { supabase, user };
-}
+});
 
 export async function getInvoices(
   showVoid: boolean = false

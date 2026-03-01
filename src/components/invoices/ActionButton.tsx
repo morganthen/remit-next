@@ -13,6 +13,7 @@ import { Button } from '../ui/button';
 import { toast } from 'sonner';
 import { markInvoicePaid, markInvoiceUnpaid } from '@/lib/actions';
 import { Invoice } from '@/lib/types';
+import { useRouter } from 'next/navigation';
 
 type ActionButtonProps = {
   onVoid: () => Promise<void>;
@@ -25,19 +26,19 @@ export default function ActionButton({
   onVoid,
   invoiceId,
   status,
-  invoice,
 }: ActionButtonProps) {
   const [open, setOpen] = useState(false);
   const [isVoiding, setIsVoiding] = useState(false);
   const [isPaying, setIsPaying] = useState(false);
   const [isUnpaying, setIsUnpaying] = useState(false);
+  const router = useRouter();
 
   async function handleMarkUnpaid() {
     setIsUnpaying(true);
     const result = await markInvoiceUnpaid(invoiceId);
     if (result.success) {
       toast.success('Invoice marked as unpaid');
-      window.location.reload();
+      router.refresh();
     } else {
       toast.error(result.error ?? 'Failed to mark as unpaid');
     }
@@ -49,14 +50,13 @@ export default function ActionButton({
     const result = await markInvoicePaid(invoiceId);
     if (result.success) {
       toast.success('Invoice marked as paid');
-      window.location.reload();
+      router.refresh();
     } else {
       toast.error(result.error ?? 'Failed to mark as paid');
     }
     setIsPaying(false);
   }
   async function handleConfirmVoid() {
-    console.log('handleConfirmVoid called');
     setIsVoiding(true);
     try {
       await onVoid();
@@ -93,10 +93,7 @@ export default function ActionButton({
         </button>
       )}
       <AlertDialog open={open} onOpenChange={setOpen}>
-        <AlertDialogTrigger
-          onClick={() => console.log('Delete button pressed')}
-          asChild
-        >
+        <AlertDialogTrigger asChild>
           <button className="w-full border-b border-stone-300 px-4 py-2 text-sm text-red-600 hover:bg-stone-50">
             Void
           </button>

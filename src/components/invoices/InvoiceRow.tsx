@@ -27,16 +27,14 @@ export default function InvoiceRow({ invoice }: InvoiceRowProps) {
       invoice.status !== 'paid' && invoice.status !== 'void' && due < today
     );
   }
-
   useEffect(() => {
     if (isOverdue(invoice) && invoice.status !== 'overdue') {
-      markInvoiceOverdue(invoice.id);
+      markInvoiceOverdue(invoice.id).then(() => {
+        router.refresh();
+      });
     }
-  }, [invoice]);
-
-  useEffect(() => {
-    console.log("InvoiceRow mounted for id:', invoice.id");
-  }, [invoice.id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [invoice.id, invoice.status, invoice.due_date]);
 
   useEffect(() => {
     if (!menuOpen) {
@@ -51,9 +49,11 @@ export default function InvoiceRow({ invoice }: InvoiceRowProps) {
         return;
       }
 
-      // Ignore clicks inside any AlertDialog portal (rendered in document.body)
-      const alertDialogContent = document.querySelector('[role="alertdialog"]');
-      if (alertDialogContent && alertDialogContent.contains(target)) {
+      // Check if click is inside any radix portal (dialogs, alerts, etc.)
+      const portalContainer = (target as Element).closest?.(
+        '[data-radix-portal]'
+      );
+      if (portalContainer) {
         return;
       }
 
@@ -126,7 +126,6 @@ export default function InvoiceRow({ invoice }: InvoiceRowProps) {
         <Button
           variant="outline"
           onClick={() => {
-            console.log('menu toggle clicked, prev:', menuOpen);
             setMenuOpen((prev) => !prev);
           }}
         >
