@@ -22,8 +22,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-stone-50">
-      <div className="w-full max-w-sm rounded-lg border border-stone-200 bg-white p-8 shadow-sm">
+    <div className="flex min-h-screen items-center justify-center bg-stone-50 dark:bg-stone-950">
+      <div className="w-full max-w-sm rounded-lg border border-stone-200 bg-white p-8 shadow-sm dark:border-stone-700 dark:bg-stone-900">
         <h1 className="mb-6 text-center text-2xl font-semibold">Log In</h1>
         <form action={handleSubmit} className="space-y-4">
           <div>
@@ -39,7 +39,7 @@ export default function LoginPage() {
             {loading ? 'Logging in...' : 'Log In'}
           </Button>
         </form>
-        <p className="mt-4 text-center text-sm text-stone-500">
+        <p className="mt-4 text-center text-sm text-stone-500 dark:text-stone-400">
           Don&apos;t have an account?{' '}
           <Link href="/signup" className="text-blue-600 hover:underline">
             Sign up

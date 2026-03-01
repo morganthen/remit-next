@@ -32,8 +32,8 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-stone-50">
-      <div className="w-full max-w-sm rounded-lg border border-stone-200 bg-white p-8 shadow-sm">
+    <div className="flex min-h-screen items-center justify-center bg-stone-50 dark:bg-stone-950">
+      <div className="w-full max-w-sm rounded-lg border border-stone-200 bg-white p-8 shadow-sm dark:border-stone-700 dark:bg-stone-900">
         <h1 className="mb-6 text-center text-2xl font-semibold">Sign Up</h1>
         <form action={handleSubmit} className="space-y-4">
           <div>
@@ -65,7 +65,7 @@ export default function SignupPage() {
             {loading ? 'Creating account...' : 'Sign Up'}
           </Button>
         </form>
-        <p className="mt-4 text-center text-sm text-stone-500">
+        <p className="mt-4 text-center text-sm text-stone-500 dark:text-stone-400">
           Already have an account?{' '}
           <Link href="/login" className="text-blue-600 hover:underline">
             Log in

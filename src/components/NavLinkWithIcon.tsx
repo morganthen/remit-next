@@ -24,7 +24,7 @@ export function NavLinkWithIcon({
       asChild
       variant="outline"
       size="responsive"
-      className={`${isActive ? 'bg-stone-200 text-stone-800' : ''} ${className}`}
+      className={`${isActive ? 'bg-stone-200 text-stone-800 dark:bg-stone-700 dark:text-stone-100' : ''} ${className}`}
     >
       <Link href={href} onClick={onClick}>
         {/* Fixed width icon container so all icons line up */}

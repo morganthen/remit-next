@@ -101,15 +101,15 @@ export default function ActionButton({
   }
 
   return (
-    <div className="absolute top-full right-0 z-10 mt-1 flex w-36 flex-col items-center justify-center rounded-md border border-stone-200 bg-white shadow-md">
+    <div className="absolute top-full right-0 z-10 mt-1 flex w-36 flex-col items-center justify-center rounded-md border border-stone-200 bg-white shadow-md dark:border-stone-600 dark:bg-stone-800">
       <Link
         href={`/overview/invoices/${invoice.id}`}
-        className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50"
+        className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50 dark:border-stone-600 dark:hover:bg-stone-700"
       >
         View Invoice
       </Link>
       <button
-        className="w-full border-b border-stone-300 px-4 py-2 text-sm hover:bg-stone-50"
+        className="w-full border-b border-stone-300 px-4 py-2 text-sm hover:bg-stone-50 dark:border-stone-600 dark:hover:bg-stone-700"
         onClick={onEdit} // ← just call onEdit
       >
         Edit
@@ -125,7 +125,7 @@ export default function ActionButton({
               )
             }
             disabled={isEmailing}
-            className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50 disabled:opacity-50"
+            className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50 disabled:opacity-50 dark:border-stone-600 dark:hover:bg-stone-700"
           >
             {isEmailing ? 'Sending...' : 'Email Client'}
           </button>
@@ -134,7 +134,7 @@ export default function ActionButton({
       {invoice.client_email && invoice.status === 'overdue' && (
         <a
           href={`mailto:${invoice.client_email}?subject=Reminder: Invoice %23${invoice.inv_num}&body=${buildMailBody(settings?.email_overdue_reminder, 'This is a friendly reminder that your invoice is now overdue. Please arrange payment at your earliest convenience.')}`}
-          className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50"
+          className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50 dark:border-stone-600 dark:hover:bg-stone-700"
         >
           Send Reminder
         </a>
@@ -143,7 +143,7 @@ export default function ActionButton({
       {invoice.client_email && invoice.status === 'paid' && (
         <a
           href={`mailto:${invoice.client_email}?subject=Receipt: Invoice %23${invoice.inv_num}&body=${buildMailBody(settings?.email_receipt, 'Thank you for your payment. This email confirms receipt of your payment in full.')}`}
-          className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50"
+          className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50 dark:border-stone-600 dark:hover:bg-stone-700"
         >
           Send Receipt
         </a>
@@ -151,7 +151,7 @@ export default function ActionButton({
 
       {status !== 'paid' && status !== 'draft' && (
         <button
-          className="w-full border-b border-stone-300 px-4 py-2 text-sm text-green-600 hover:bg-stone-50"
+          className="w-full border-b border-stone-300 px-4 py-2 text-sm text-green-600 hover:bg-stone-50 dark:border-stone-600 dark:hover:bg-stone-700"
           disabled={isPaying}
           onClick={handleMarkPaid}
         >
@@ -160,7 +160,7 @@ export default function ActionButton({
       )}
       {status === 'paid' && (
         <button
-          className="w-full border-b border-stone-300 px-4 py-2 text-sm text-amber-600 hover:bg-stone-50"
+          className="w-full border-b border-stone-300 px-4 py-2 text-sm text-amber-600 hover:bg-stone-50 dark:border-stone-600 dark:hover:bg-stone-700"
           disabled={isUnpaying}
           onClick={handleMarkUnpaid}
         >
@@ -169,7 +169,7 @@ export default function ActionButton({
       )}
       <AlertDialog open={open} onOpenChange={setOpen}>
         <AlertDialogTrigger asChild>
-          <button className="w-full border-b border-stone-300 px-4 py-2 text-sm text-red-600 hover:bg-stone-50">
+          <button className="w-full border-b border-stone-300 px-4 py-2 text-sm text-red-600 hover:bg-stone-50 dark:border-stone-600 dark:hover:bg-stone-700">
             Void
           </button>
         </AlertDialogTrigger>

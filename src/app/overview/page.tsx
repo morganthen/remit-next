@@ -13,7 +13,7 @@ export default async function Page() {
 
   return (
     <div className="flex flex-col items-center justify-center px-8 md:mx-auto md:max-w-3xl">
-      <h1 className="my-4 w-full max-w-full border-b border-stone-200 pb-2 text-2xl font-semibold tracking-tight text-stone-800">
+      <h1 className="my-4 w-full max-w-full border-b border-stone-200 pb-2 text-2xl font-semibold tracking-tight text-stone-800 dark:border-stone-700 dark:text-stone-100">
         Overview
       </h1>
       {hasInvoices ? (
@@ -27,12 +27,14 @@ export default async function Page() {
         </>
       ) : (
         <div className="mt-24 flex flex-col items-center justify-center gap-4 text-center">
-          <div className="rounded-full bg-stone-100 p-4">
-            <DocumentPlusIcon className="h-8 w-8 text-stone-400" />
+          <div className="rounded-full bg-stone-100 p-4 dark:bg-stone-800">
+            <DocumentPlusIcon className="h-8 w-8 text-stone-400 dark:text-stone-500" />
           </div>
           <div>
-            <p className="font-medium text-stone-800">No invoices yet</p>
-            <p className="mt-1 text-sm text-stone-500">
+            <p className="font-medium text-stone-800 dark:text-stone-100">
+              No invoices yet
+            </p>
+            <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
               Create your first invoice to get started
             </p>
           </div>

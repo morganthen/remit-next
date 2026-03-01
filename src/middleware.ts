@@ -31,18 +31,20 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  const publicPaths = ['/login', '/signup', '/invoice'];
+  const authPaths = ['/login', '/signup'];
+  const publicPaths = [...authPaths, '/invoice'];
   const isPublicPath = publicPaths.some((path) => pathname.startsWith(path));
+  const isAuthPath = authPaths.some((path) => pathname.startsWith(path));
 
-  // Not logged in -> login page
+  // Not logged in → login page
   if (!user && !isPublicPath) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
   }
 
-  // Logged in + trying to access login/signup -> root
-  if (user && isPublicPath) {
+  // Logged in + trying to access login/signup (not /invoice) → root
+  if (user && isAuthPath) {
     const url = request.nextUrl.clone();
     url.pathname = '/';
     return NextResponse.redirect(url);

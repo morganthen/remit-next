@@ -24,8 +24,8 @@ export default function ShowVoidToggle() {
       onClick={handleToggle}
       className={`rounded-md px-3 py-1 text-xs transition-colors ${
         showVoid
-          ? 'bg-stone-800 text-white'
-          : 'bg-stone-100 text-stone-500 hover:bg-stone-200'
+          ? 'bg-stone-800 text-white dark:bg-stone-200 dark:text-stone-900'
+          : 'bg-stone-100 text-stone-500 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700'
       }`}
     >
       {showVoid ? 'Hide Void' : 'Show Void'}

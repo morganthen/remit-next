@@ -62,8 +62,8 @@ export default function FilterBar({
             onClick={() => updateStatus(s)}
             className={`rounded-full px-3 py-1 text-xs capitalize transition-colors ${
               activeStatus === s
-                ? 'bg-stone-800 text-white'
-                : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                ? 'bg-stone-800 text-white dark:bg-stone-200 dark:text-stone-900'
+                : 'bg-stone-100 text-stone-600 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700'
             }`}
           >
             {s}
@@ -75,7 +75,7 @@ export default function FilterBar({
         placeholder="Search by client or invoice number..."
         value={searchInput}
         onChange={(e) => setSearchInput(e.target.value)}
-        className="w-full rounded-md border border-stone-200 px-3 py-2 text-sm outline-none focus:border-stone-400"
+        className="w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none focus:border-stone-400 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100 dark:focus:border-stone-500"
       />
     </div>
   );

@@ -1,17 +1,15 @@
-import {
-  ArrowLeftEndOnRectangleIcon,
-  MoonIcon,
-} from '@heroicons/react/24/outline';
+import { ArrowLeftEndOnRectangleIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import { ButtonWithIcon } from './ButtonWithIcon';
 import { logout } from '@/lib/auth/actions';
 import { getSettings } from '@/lib/data';
+import ThemeToggle from './ThemeToggle';
 
 export default async function Header() {
   const settings = await getSettings();
 
   return (
-    <div className="flex h-full items-center justify-between bg-stone-50 px-4 py-2 md:justify-end">
+    <div className="flex h-full items-center justify-between bg-stone-50 px-4 py-2 md:justify-end dark:bg-stone-900">
       {/* Left: Logo */}
       <div className="-ml-6 md:hidden">
         <Image
@@ -29,7 +27,7 @@ export default async function Header() {
           <span className="hidden md:inline">Welcome,</span>
           {settings?.business_name ? ` ${settings.business_name}` : ''}
         </p>
-        <ButtonWithIcon icon={MoonIcon} variant="outline"></ButtonWithIcon>
+        <ThemeToggle />
         <form action={logout}>
           <ButtonWithIcon
             icon={ArrowLeftEndOnRectangleIcon}

@@ -24,9 +24,13 @@ function SectionHeader({
   description: string;
 }) {
   return (
-    <div className="mb-4 border-b border-stone-100 pb-2">
-      <h2 className="font-semibold text-stone-800">{title}</h2>
-      <p className="text-xs text-stone-400">{description}</p>
+    <div className="mb-4 border-b border-stone-100 pb-2 dark:border-stone-700">
+      <h2 className="font-semibold text-stone-800 dark:text-stone-100">
+        {title}
+      </h2>
+      <p className="text-xs text-stone-400 dark:text-stone-500">
+        {description}
+      </p>
     </div>
   );
 }

@@ -5,6 +5,7 @@ export type Invoice = {
   due_date: string;
   status: 'draft' | 'unpaid' | 'paid' | 'overdue' | 'void';
   created_at: string;
+  paid_at: string | null;
   inv_num: number;
   client_name: string;
   client_email: string;

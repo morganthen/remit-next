@@ -68,7 +68,7 @@ export default function ClientRow({ client }: { client: Client }) {
   }
 
   return (
-    <div className="relative mb-2 grid max-w-full min-w-4 grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] items-center justify-between gap-x-3 rounded-lg border border-stone-100 bg-white px-5 py-5 shadow-sm transition-all hover:border-stone-300 hover:shadow-md md:min-w-full">
+    <div className="relative mb-2 grid max-w-full min-w-4 grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] items-center justify-between gap-x-3 rounded-lg border border-stone-100 bg-white px-5 py-5 shadow-sm transition-all hover:border-stone-300 hover:shadow-md md:min-w-full dark:border-stone-700 dark:bg-stone-800 dark:hover:border-stone-500">
       {/*Client name and email*/}
       <div className="col-span-2 col-start-1 flex flex-col">
         <p>{client.name}</p>
@@ -90,14 +90,14 @@ export default function ClientRow({ client }: { client: Client }) {
           <Bars3Icon />
         </Button>
         {menuOpen && (
-          <div className="absolute top-full right-0 z-10 mt-1 flex w-36 flex-col items-center rounded-md border border-stone-200 bg-white shadow-md">
+          <div className="absolute top-full right-0 z-10 mt-1 flex w-36 flex-col items-center rounded-md border border-stone-200 bg-white shadow-md dark:border-stone-600 dark:bg-stone-800">
             <EditClientDialog
               client={client}
-              className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50"
+              className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50 dark:border-stone-600 dark:hover:bg-stone-700"
             />
             <AlertDialog open={open} onOpenChange={setOpen}>
               <AlertDialogTrigger asChild>
-                <button className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm text-red-600 hover:bg-stone-50">
+                <button className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm text-red-600 hover:bg-stone-50 dark:border-stone-600 dark:hover:bg-stone-700">
                   Delete
                 </button>
               </AlertDialogTrigger>

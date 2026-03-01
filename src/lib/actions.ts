@@ -13,8 +13,6 @@ export async function voidInvoice(
       data: { user },
     } = await supabase.auth.getUser();
 
-    console.log('Voiding invoice:', { id, userId: user?.id });
-
     if (!user) return { success: false, error: 'Not authenticated' };
 
     const { data, error } = await supabase
@@ -23,8 +21,6 @@ export async function voidInvoice(
       .eq('id', id)
       .eq('user_id', user.id)
       .select();
-
-    console.log('Void result:', { data, error });
 
     if (error) {
       console.error('Supabase error:', error);
@@ -127,6 +123,23 @@ export async function updateInvoice(
 
   if (!user) return { success: false, error: 'Not authenticated' };
 
+  // Determine paid_at: preserve existing if already paid, set now if newly paid, clear if unpaid
+  let paid_at: string | null | undefined = undefined;
+  if (invoiceData.status === 'paid') {
+    const { data: existing } = await supabase
+      .from('invoices')
+      .select('status, paid_at')
+      .eq('id', invoiceId)
+      .eq('user_id', user.id)
+      .single();
+    paid_at =
+      existing?.status === 'paid' && existing?.paid_at
+        ? existing.paid_at
+        : new Date().toISOString();
+  } else {
+    paid_at = null;
+  }
+
   const { error } = await supabase
     .from('invoices')
     .update({
@@ -135,6 +148,7 @@ export async function updateInvoice(
       amount: invoiceData.amount,
       due_date: invoiceData.due_date,
       status: invoiceData.status,
+      paid_at,
     })
     .eq('id', invoiceId)
     .eq('user_id', user.id);
@@ -213,7 +227,7 @@ export async function markInvoicePaid(
 
   const { data, error } = await supabase
     .from('invoices')
-    .update({ status: 'paid' })
+    .update({ status: 'paid', paid_at: new Date().toISOString() })
     .eq('id', id)
     .eq('user_id', user.id)
     .select();
@@ -242,7 +256,7 @@ export async function markInvoiceUnpaid(
 
   const { data, error } = await supabase
     .from('invoices')
-    .update({ status: 'unpaid' })
+    .update({ status: 'unpaid', paid_at: null })
     .eq('id', id)
     .eq('user_id', user.id)
     .select();

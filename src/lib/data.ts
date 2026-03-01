@@ -84,6 +84,7 @@ export async function getRecentInvoices(): Promise<Invoice[]> {
       due_date,
       status,
       created_at,
+      paid_at,
       inv_num,
       client_name,
       client_email
@@ -206,7 +207,7 @@ export async function getPublicInvoiceById(
   const { data, error } = await supabase
     .from('invoices')
     .select(
-      'id, user_id, amount, due_date, status, created_at, inv_num, client_name, client_email'
+      'id, user_id, amount, due_date, status, created_at, paid_at, inv_num, client_name, client_email'
     )
     .eq('id', id)
     .single();

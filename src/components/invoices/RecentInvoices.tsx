@@ -11,14 +11,14 @@ export default async function RecentInvoices() {
 
   return (
     <>
-      <div className="my-4 flex w-full max-w-full items-center justify-between border-b border-stone-200 pb-2">
-        <h1 className="text-2xl font-semibold tracking-tight text-stone-800">
+      <div className="my-4 flex w-full max-w-full items-center justify-between border-b border-stone-200 pb-2 dark:border-stone-700">
+        <h1 className="text-2xl font-semibold tracking-tight text-stone-800 dark:text-stone-100">
           Recent Invoices
         </h1>
         {recentInvoices.length > 0 && (
           <Link
             href="/overview/invoices"
-            className="text-sm text-stone-500 transition-colors hover:text-stone-800"
+            className="text-sm text-stone-500 transition-colors hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200"
           >
             See all →
           </Link>
