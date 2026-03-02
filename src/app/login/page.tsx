@@ -1,26 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { login } from '@/lib/auth/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
-import OnboardingForm from '@/components/OnboardingForm';
-import SignupPage from '../signup/page';
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   async function handleSubmit(formData: FormData) {
-    setLoading(true);
     setError(null);
-    const result = await login(formData);
-    if (result?.error) {
-      setError(result.error);
-      setLoading(false);
-    }
+    startTransition(async () => {
+      const result = await login(formData);
+      if (result?.error) {
+        setError(result.error);
+      }
+    });
   }
 
   return (
@@ -41,8 +39,8 @@ export default function LoginPage() {
             <Input id="password" name="password" type="password" required />
           </div>
           {error && <p className="text-sm text-red-500">{error}</p>}
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Logging in...' : 'Log In'}
+          <Button type="submit" className="w-full" disabled={isPending}>
+            {isPending ? 'Logging in...' : 'Log In'}
           </Button>
         </form>
         <p className="mt-4 text-center text-sm text-stone-500 dark:text-stone-400">
