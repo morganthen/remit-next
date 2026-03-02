@@ -8,29 +8,37 @@ Remit is a lightweight, responsive invoicing dashboard built to help freelancers
 
 ### 🚀 Key Features
 
-- **User Authentication:** Working on this choosing between NextAuth or SupabaseAuth.
+- **User Authentication:** Secure sign up, login via Supabase Auth.
 - **Full CRUD Support:** Create, Read, Update, and Delete invoices with immediate UI feedback.
-- **Financial Insights:** Real-time calculation of "Total Outstanding" and "Total Collected" balances.
-- **Dynamic Status Management:** Categorize invoices as **Draft**, **Unpaid**, or **Paid** with a custom action menu.
-- **Secure Data Architecture:** Row-Level Security (RLS) policies ensure data isolation between users.
+- **Financial Insights:** Real-time calculation of "Total Outstanding", "Total Collected" balances, Average Invoice Amount and 7-day Rolling Average"
+- **Dynamic Status Management:** Categorize invoices as **Draft**, **Unpaid**, **Paid**, or **Void** with a custom action menu
+  **Client Management** – Manage a client list and associate invoices to clients
+- **Printable Invoices** – Dedicated invoice view optimized for print
+- **Dark / Light Mode** – System-aware theme toggle
+- **Secure Data Architecture** – Row-Level Security (RLS) policies ensure strict data isolation between users
 
 ### 🛠️ Tech Stack
 
-- **Frontend:** React 18 (Next)
-- **Styling:** Tailwind CSS
-- **Backend:** Supabase (PostgreSQL)
-- **Deployment:** Vercel
+| Layer              | Technology                                  |
+| ------------------ | ------------------------------------------- |
+| Framework          | Next.js 15 (App Router, Server Actions)     |
+| Language           | TypeScript                                  |
+| UI                 | React 19, shadcn/ui, Radix UI, Lucide React |
+| Styling            | Tailwind CSS v4                             |
+| Forms & Validation | React Hook Form + Zod                       |
+| Auth & Database    | Supabase (PostgreSQL + RLS)                 |
+| Deployment         | Vercel                                      |
 
 ### 🏗️ Database Schema
 
-The app utilizes a relational PostgreSQL schema. The `invoices` table is linked to authenticated users to maintain strict data ownership:
-
-- `id`: UUID (Primary Key)
-- `user_id`: UUID (Foreign Key to Auth)
-- `client_name`: Text
-- `amount`: Decimal
-- `status`: Text (Draft, Unpaid, Paid)
-- `due_date`: Date
+| Column        | Type    | Notes                     |
+| ------------- | ------- | ------------------------- |
+| `id`          | UUID    | Primary Key               |
+| `user_id`     | UUID    | Foreign Key → Auth        |
+| `client_name` | Text    |                           |
+| `amount`      | Decimal |                           |
+| `status`      | Text    | Draft, Unpaid, Paid, Void |
+| `due_date`    | Date    |                           |
 
 ### 🤕 Challenges Overcome
 
@@ -39,3 +47,15 @@ Persistent Authentication: Implemented a useAuth context to maintain session sta
 UI/UX Polishing: Solved CSS stacking context issues with absolute-positioned dropdown menus inside overflow-hidden containers.
 
 Relational Security: Configured Supabase RLS policies to allow granular "Manage" permissions for owners while denying all public access.
+
+---
+
+## 🏃 Running Locally
+
+```bash
+git clone https://github.com/your-username/remit-next.git
+cd remit-next
+npm install
+cp .env.example .env.local  # Add your Supabase keys
+npm run dev
+```

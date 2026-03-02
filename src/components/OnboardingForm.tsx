@@ -61,7 +61,7 @@ export default function OnboardingForm() {
         </p>
         <div className="space-y-4">
           <div>
-            <Label htmlFor="business_name" className="text-stone-300">
+            <Label htmlFor="business_name" className="mb-2 text-stone-300">
               Business Name
             </Label>
             <Input
@@ -77,7 +77,7 @@ export default function OnboardingForm() {
             )}
           </div>
           <div>
-            <Label htmlFor="business_email" className="text-stone-300">
+            <Label htmlFor="business_email" className="mb-2 text-stone-300">
               Business Email
             </Label>
             <Input
@@ -103,7 +103,7 @@ export default function OnboardingForm() {
         </p>
         <div className="space-y-4">
           <div>
-            <Label htmlFor="business_phone" className="text-stone-300">
+            <Label htmlFor="business_phone" className="mb-2 text-stone-300">
               Phone
             </Label>
             <Input
@@ -114,7 +114,7 @@ export default function OnboardingForm() {
             />
           </div>
           <div>
-            <Label htmlFor="business_address" className="text-stone-300">
+            <Label htmlFor="business_address" className="mb-2 text-stone-300">
               Address
             </Label>
             <Textarea

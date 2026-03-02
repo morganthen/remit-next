@@ -86,7 +86,9 @@ export default function SettingsForm({
         />
         <div className="space-y-4">
           <div>
-            <Label htmlFor="business_name">Business Name</Label>
+            <Label className="mb-2" htmlFor="business_name">
+              Business Name
+            </Label>
             <Input id="business_name" {...register('business_name')} />
             {errors.business_name && (
               <p className="mt-1 text-xs text-red-500">
@@ -95,7 +97,9 @@ export default function SettingsForm({
             )}
           </div>
           <div>
-            <Label htmlFor="business_email">Business Email</Label>
+            <Label className="mb-2" htmlFor="business_email">
+              Business Email
+            </Label>
             <Input
               id="business_email"
               type="email"
@@ -108,11 +112,15 @@ export default function SettingsForm({
             )}
           </div>
           <div>
-            <Label htmlFor="business_phone">Phone</Label>
+            <Label className="mb-2" htmlFor="business_phone">
+              Phone
+            </Label>
             <Input id="business_phone" {...register('business_phone')} />
           </div>
           <div>
-            <Label htmlFor="business_address">Address</Label>
+            <Label className="mb-2" htmlFor="business_address">
+              Address
+            </Label>
             <Textarea
               id="business_address"
               rows={3}
@@ -131,11 +139,15 @@ export default function SettingsForm({
         />
         <div className="space-y-4">
           <div>
-            <Label htmlFor="payment_bank_name">Bank Name</Label>
+            <Label className="mb-2" htmlFor="payment_bank_name">
+              Bank Name
+            </Label>
             <Input id="payment_bank_name" {...register('payment_bank_name')} />
           </div>
           <div>
-            <Label htmlFor="payment_account_name">Account Name</Label>
+            <Label className="mb-2" htmlFor="payment_account_name">
+              Account Name
+            </Label>
             <Input
               id="payment_account_name"
               {...register('payment_account_name')}
@@ -143,14 +155,18 @@ export default function SettingsForm({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="payment_account_number">Account Number</Label>
+              <Label className="mb-2" htmlFor="payment_account_number">
+                Account Number
+              </Label>
               <Input
                 id="payment_account_number"
                 {...register('payment_account_number')}
               />
             </div>
             <div>
-              <Label htmlFor="payment_bsb">BSB</Label>
+              <Label className="mb-2" htmlFor="payment_bsb">
+                BSB
+              </Label>
               <Input
                 id="payment_bsb"
                 placeholder="000-000"
@@ -159,7 +175,9 @@ export default function SettingsForm({
             </div>
           </div>
           <div>
-            <Label htmlFor="payment_notes">Payment Notes</Label>
+            <Label className="mb-2" htmlFor="payment_notes">
+              Payment Notes
+            </Label>
             <Textarea
               id="payment_notes"
               rows={2}
@@ -178,7 +196,9 @@ export default function SettingsForm({
         />
         <div className="space-y-4">
           <div>
-            <Label htmlFor="email_new_invoice">New Invoice</Label>
+            <Label className="mb-2" htmlFor="email_new_invoice">
+              New Invoice
+            </Label>
             <Textarea
               id="email_new_invoice"
               rows={3}
@@ -186,7 +206,9 @@ export default function SettingsForm({
             />
           </div>
           <div>
-            <Label htmlFor="email_overdue_reminder">Overdue Reminder</Label>
+            <Label className="mb-2" htmlFor="email_overdue_reminder">
+              Overdue Reminder
+            </Label>
             <Textarea
               id="email_overdue_reminder"
               rows={3}
@@ -194,7 +216,9 @@ export default function SettingsForm({
             />
           </div>
           <div>
-            <Label htmlFor="email_receipt">Receipt Acknowledgement</Label>
+            <Label className="mb-2" htmlFor="email_receipt">
+              Receipt Acknowledgement
+            </Label>
             <Textarea
               id="email_receipt"
               rows={3}
@@ -208,7 +232,7 @@ export default function SettingsForm({
       <section>
         <SectionHeader title="Account" description="Your login details." />
         <div>
-          <Label>Email</Label>
+          <Label className="mb-2">Email</Label>
           <Input
             value={userEmail}
             disabled

@@ -37,11 +37,15 @@ export default function SignupPage() {
         <h1 className="mb-6 text-center text-2xl font-semibold">Sign Up</h1>
         <form action={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label className="mb-2" htmlFor="email">
+              Email
+            </Label>
             <Input id="email" name="email" type="email" required />
           </div>
           <div>
-            <Label htmlFor="password">Password</Label>
+            <Label className="mb-2" htmlFor="password">
+              Password
+            </Label>
             <Input
               id="password"
               name="password"
@@ -51,7 +55,9 @@ export default function SignupPage() {
             />
           </div>
           <div>
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Label className="mb-2" htmlFor="confirmPassword">
+              Confirm Password
+            </Label>
             <Input
               id="confirmPassword"
               name="confirmPassword"

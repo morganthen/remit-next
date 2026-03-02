@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
+import OnboardingForm from '@/components/OnboardingForm';
+import SignupPage from '../signup/page';
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
@@ -27,11 +29,15 @@ export default function LoginPage() {
         <h1 className="mb-6 text-center text-2xl font-semibold">Log In</h1>
         <form action={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label className="mb-2" htmlFor="email">
+              Email
+            </Label>
             <Input id="email" name="email" type="email" required />
           </div>
           <div>
-            <Label htmlFor="password">Password</Label>
+            <Label className="mb-2" htmlFor="password">
+              Password
+            </Label>
             <Input id="password" name="password" type="password" required />
           </div>
           {error && <p className="text-sm text-red-500">{error}</p>}
