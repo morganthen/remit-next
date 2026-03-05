@@ -303,7 +303,7 @@ export async function upsertSettings(
     },
     {
       onConflict: 'user_id',
-      ignoreDuplicates: false, // ← always update if exists
+      ignoreDuplicates: false, //  always update if exists
     }
   );
 

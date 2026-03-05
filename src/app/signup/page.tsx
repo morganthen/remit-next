@@ -9,7 +9,6 @@ import Link from 'next/link';
 
 export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   async function handleSubmit(formData: FormData) {

@@ -60,18 +60,6 @@ export async function getInvoices({
   return (data ?? []) as unknown as Invoice[];
 }
 
-export async function getInvoiceCount(): Promise<number> {
-  const { supabase, user } = await getSupabaseWithUser();
-
-  const { count, error } = await supabase
-    .from('invoices')
-    .select('*', { count: 'exact', head: true }) // head:true means no rows returned, just the count
-    .eq('user_id', user.id);
-
-  if (error) return 0;
-  return count ?? 0;
-}
-
 export async function getRecentInvoices(): Promise<Invoice[]> {
   const { supabase, user } = await getSupabaseWithUser();
 
@@ -100,6 +88,18 @@ export async function getRecentInvoices(): Promise<Invoice[]> {
     throw new Error("There's an error getting recent invoices");
   }
   return (data ?? []) as unknown as Invoice[];
+}
+
+export async function getInvoiceCount(): Promise<number> {
+  const { supabase, user } = await getSupabaseWithUser();
+
+  const { count, error } = await supabase
+    .from('invoices')
+    .select('*', { count: 'exact', head: true }) // head:true means no rows returned, just the count
+    .eq('user_id', user.id);
+
+  if (error) return 0;
+  return count ?? 0;
 }
 
 export async function getClients(): Promise<Client[]> {

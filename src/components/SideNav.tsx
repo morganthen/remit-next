@@ -8,13 +8,14 @@ export default function SideNav() {
       <div className="flex h-full items-center md:block">
         <Link
           className="hidden items-center justify-center rounded-md p-4 md:mb-2 md:flex md:h-auto"
-          href="/"
+          href="/overview"
         >
           <Image
             src="/remit-logo.png"
             width="150"
             height="150"
             alt="Logo of Remit"
+            className="dark:invert"
           />
         </Link>
         <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-y-2 md:space-x-0">

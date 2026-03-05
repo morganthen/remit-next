@@ -41,7 +41,7 @@ export default function ActionButton({
     fallback: string
   ): string {
     const greeting = `Hi ${invoice.client_name},\n\n`;
-    const body = `${greeting}${template || fallback}\n\nYou can view the invoice here: ${invoiceUrl}`;
+    const body = `${greeting}${template || fallback}\n\nYou can view the invoice here:\n${invoiceUrl}`;
     return encodeURIComponent(body);
   }
   const [open, setOpen] = useState(false);
@@ -110,7 +110,7 @@ export default function ActionButton({
       </Link>
       <button
         className="w-full border-b border-stone-300 px-4 py-2 text-sm hover:bg-stone-50 dark:border-stone-600 dark:hover:bg-stone-700"
-        onClick={onEdit} // ← just call onEdit
+        onClick={onEdit}
       >
         Edit
       </button>

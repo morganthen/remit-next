@@ -80,14 +80,18 @@ export default function CreateClientDialog({
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <Label htmlFor="name">Name</Label>
+            <Label className="mb-2" htmlFor="name">
+              Name
+            </Label>
             <Input id="name" {...register('name')} />
             {errors.name && (
               <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>
             )}
           </div>
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label className="mb-2" htmlFor="email">
+              Email
+            </Label>
             <Input id="email" type="email" {...register('email')} />
             {errors.email && (
               <p className="mt-1 text-xs text-red-500">

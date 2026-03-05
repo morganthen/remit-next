@@ -19,8 +19,7 @@ export async function createClient() {
             );
           } catch {
             // This can be ignored if you have middleware refreshing sessions.
-            // The `setAll` method is called from a Server Component
-            // where cookies can't be set directly.
+            // The `setAll` method is called from a Server Component where cookies can't be set directly.
           }
         },
       },

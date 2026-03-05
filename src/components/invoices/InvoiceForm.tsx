@@ -24,7 +24,7 @@ type InvoiceFormProps = {
   nextInvoiceNumber: number;
   onSubmit: (data: InvoiceFormData) => Promise<void>;
   onCancel: () => void;
-  defaultInvoice?: Invoice; // ← new, optional
+  defaultInvoice?: Invoice;
 };
 
 export default function InvoiceForm({
@@ -34,6 +34,7 @@ export default function InvoiceForm({
   onCancel,
   defaultInvoice,
 }: InvoiceFormProps) {
+  // defaultInvoice passed? then editing is true
   const isEditing = !!defaultInvoice;
   const [clients, setClients] = useState<Client[]>(initialClients);
 
@@ -77,7 +78,7 @@ export default function InvoiceForm({
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {/* Invoice number — read only */}
       <div>
-        <Label>Invoice Number</Label>
+        <Label className="mb-2">Invoice Number</Label>
         <p className="rounded-md border border-stone-200 bg-stone-50 px-3 py-2 text-sm text-stone-500">
           #
           {isEditing
@@ -88,7 +89,7 @@ export default function InvoiceForm({
 
       {/* Client selection */}
       <div>
-        <Label>Client</Label>
+        <Label className="mb-2">Client</Label>
         <div className="flex items-center gap-2">
           <div className="flex-1">
             <Select
@@ -123,7 +124,9 @@ export default function InvoiceForm({
 
       {/* Amount */}
       <div>
-        <Label htmlFor="amount">Amount</Label>
+        <Label className="mb-2" htmlFor="amount">
+          Amount
+        </Label>
         <Input
           id="amount"
           type="number"
@@ -139,7 +142,9 @@ export default function InvoiceForm({
 
       {/* Due date */}
       <div>
-        <Label htmlFor="due_date">Due Date</Label>
+        <Label className="mb-2" htmlFor="due_date">
+          Due Date
+        </Label>
         <Input id="due_date" type="date" {...register('due_date')} />
         {errors.due_date && (
           <p className="mt-1 text-xs text-red-500">{errors.due_date.message}</p>
