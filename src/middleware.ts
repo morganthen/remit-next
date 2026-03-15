@@ -46,7 +46,7 @@ export async function middleware(request: NextRequest) {
   // Logged in + trying to access login/signup (not /invoice) → root
   if (user && isAuthPath) {
     const url = request.nextUrl.clone();
-    url.pathname = '/';
+    url.pathname = '/overview';
     return NextResponse.redirect(url);
   }
 

@@ -17,7 +17,7 @@ export default async function Header() {
           width={80}
           height={80}
           alt="Logo of Remit"
-          className="object-contain"
+          className="object-contain dark:invert"
         />
       </div>
 
