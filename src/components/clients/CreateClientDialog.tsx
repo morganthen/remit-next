@@ -26,7 +26,7 @@ type CreateClientDialogProps = {
     email: string;
   }) => void;
   className: string;
-  onNestedOpen: Dispatch<SetStateAction<boolean>>;
+  onNestedOpen?: Dispatch<SetStateAction<boolean>>;
   variant?:
     | 'outline'
     | 'default'
@@ -72,7 +72,9 @@ export default function CreateClientDialog({
 
   function openChange() {
     setOpen((s) => !s);
-    onNestedOpen((i) => !i);
+    if (onNestedOpen) {
+      onNestedOpen((i) => !i);
+    }
   }
 
   return (
