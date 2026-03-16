@@ -25,6 +25,7 @@ export type Settings = {
   email_new_invoice: string | null;
   email_overdue_reminder: string | null;
   email_receipt: string | null;
+  email_void: string | null;
   created_at: string;
 };
 

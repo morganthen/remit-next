@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Button } from '../ui/button';
 import { Client } from '@/lib/types';
 import EditClientDialog from './EditClientDialog';
@@ -18,53 +18,32 @@ import {
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import { Bars3Icon } from '@heroicons/react/24/outline';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
+import { EllipsisVertical, Trash } from 'lucide-react';
 
 export default function ClientRow({ client }: { client: Client }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const [open, setOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    if (!menuOpen) {
-      return;
-    }
-
-    function handleClickOutside(event: MouseEvent) {
-      const target = event.target as Node;
-
-      // Ignore clicks inside the menu
-      if (menuRef.current && menuRef.current.contains(target)) {
-        return;
-      }
-
-      // Ignore clicks inside any AlertDialog portal (rendered in document.body)
-      const alertDialogContent = document.querySelector('[role="alertdialog"]');
-      if (alertDialogContent && alertDialogContent.contains(target)) {
-        return;
-      }
-
-      setMenuOpen(false);
-    }
-
-    // Bind event listener only when the menu is open
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      // clean up
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [menuOpen]);
-
   async function handleDelete() {
+    setIsDeleting(true);
     const result = await deleteClient(client.id);
+
     if (result.success) {
       toast.success('Client deleted');
       router.refresh();
+      setIsDeleting(false);
     } else {
       toast.error(result.error ?? 'Failed to delete client');
+      setIsDeleting(false);
     }
-    setOpen(false);
   }
 
   return (
@@ -77,48 +56,51 @@ export default function ClientRow({ client }: { client: Client }) {
         <p>{client.email}</p>
       </div>
 
-      <div
-        ref={menuRef}
-        className="relative col-span-1 col-end-9 flex justify-end"
-      >
-        <Button
-          variant="outline"
-          onClick={() => {
-            setMenuOpen((prev) => !prev);
-          }}
-        >
-          <Bars3Icon />
-        </Button>
-        {menuOpen && (
-          <div className="absolute top-full right-0 z-10 mt-1 flex w-36 flex-col items-center rounded-md border border-stone-200 bg-white shadow-md dark:border-stone-600 dark:bg-stone-800">
-            <EditClientDialog
-              client={client}
-              className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50 dark:border-stone-600 dark:hover:bg-stone-700"
-            />
-            <AlertDialog open={open} onOpenChange={setOpen}>
-              <AlertDialogTrigger asChild>
-                <button className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm text-red-600 hover:bg-stone-50 dark:border-stone-600 dark:hover:bg-stone-700">
-                  Delete
-                </button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Delete this client?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This will remove the client from your address book. Existing
-                    invoices will not be affected.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDelete}>
-                    Delete
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-        )}
+      <div className="relative col-span-1 col-end-9 flex justify-end">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">
+              <EllipsisVertical></EllipsisVertical>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-36">
+            <DropdownMenuGroup>
+              <DropdownMenuLabel asChild>
+                <EditClientDialog client={client} isDeleting={isDeleting} />
+              </DropdownMenuLabel>
+
+              <DropdownMenuLabel asChild>
+                <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="w-full border-stone-300 text-center text-sm text-red-600 hover:bg-stone-50 dark:border-stone-600 dark:hover:bg-stone-700"
+                      disabled={isDeleting}
+                    >
+                      <Trash></Trash>
+                      Delete
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete this client?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will remove the client from your address book.
+                        Existing invoices will not be affected.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDelete}>
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </DropdownMenuLabel>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );

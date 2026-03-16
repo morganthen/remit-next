@@ -17,6 +17,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { Pencil } from 'lucide-react';
 
 type EditClientDialogProps = {
   client: {
@@ -24,12 +25,13 @@ type EditClientDialogProps = {
     name: string;
     email: string;
   };
-  className: string;
+  isDeleting: boolean;
+  // className: string;
 };
 
 export default function EditClientDialog({
+  isDeleting,
   client,
-  className,
 }: EditClientDialogProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
@@ -72,7 +74,14 @@ export default function EditClientDialog({
       }}
     >
       <DialogTrigger asChild>
-        <span className={className}>Edit</span>
+        <Button
+          variant="ghost"
+          className="w-full border-stone-300 text-sm hover:bg-stone-50 dark:border-stone-600 dark:hover:bg-stone-700"
+          disabled={isDeleting}
+        >
+          <Pencil></Pencil>
+          Edit
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

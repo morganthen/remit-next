@@ -5,6 +5,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from '@/components/ui/dialog';
 import InvoiceForm from './InvoiceForm';
 import { updateInvoice } from '@/lib/actions';
@@ -12,6 +13,8 @@ import { Client, Invoice } from '@/lib/types';
 import { InvoiceFormData } from '@/lib/schemas';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { Button } from '../ui/button';
+import { Pencil } from 'lucide-react';
 
 type EditInvoiceDialogProps = {
   invoice: Invoice;
@@ -41,6 +44,15 @@ export default function EditInvoiceDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogTrigger asChild>
+        <Button
+          variant="ghost"
+          className="w-full border-stone-300 text-sm hover:bg-stone-50 dark:border-stone-600 dark:hover:bg-stone-700"
+        >
+          <Pencil></Pencil>
+          Edit
+        </Button>
+      </DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>
