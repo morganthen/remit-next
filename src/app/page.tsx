@@ -14,7 +14,7 @@ export default function Home() {
               width={56}
               height={56}
               alt="Remit logo"
-              className="object-contain dark:invert"
+              className="object-contain"
             />
             <div className="mr-8">
               <h3 className="text-sm font-semibold">Remit</h3>
