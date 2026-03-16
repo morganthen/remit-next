@@ -91,6 +91,7 @@ export default function ActionButton({
     setIsPaying(false);
   }
   async function handleConfirmVoid() {
+    setOpen(true);
     setIsVoiding(true);
     try {
       await onVoid();
@@ -106,7 +107,7 @@ export default function ActionButton({
         href={`/overview/invoices/${invoice.id}`}
         className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50 dark:border-stone-600 dark:hover:bg-stone-700"
       >
-        View Invoice
+        View
       </Link>
       <button
         className="w-full border-b border-stone-300 px-4 py-2 text-sm hover:bg-stone-50 dark:border-stone-600 dark:hover:bg-stone-700"
@@ -127,7 +128,7 @@ export default function ActionButton({
             disabled={isEmailing}
             className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50 disabled:opacity-50 dark:border-stone-600 dark:hover:bg-stone-700"
           >
-            {isEmailing ? 'Sending...' : 'Email Client'}
+            {isEmailing ? 'Sending...' : 'Email'}
           </button>
         )}
 
@@ -136,7 +137,7 @@ export default function ActionButton({
           href={`mailto:${invoice.client_email}?subject=Reminder: Invoice %23${invoice.inv_num}&body=${buildMailBody(settings?.email_overdue_reminder, 'This is a friendly reminder that your invoice is now overdue. Please arrange payment at your earliest convenience.')}`}
           className="w-full border-b border-stone-300 px-4 py-2 text-center text-sm hover:bg-stone-50 dark:border-stone-600 dark:hover:bg-stone-700"
         >
-          Send Reminder
+          Remind
         </a>
       )}
 

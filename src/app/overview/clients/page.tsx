@@ -14,7 +14,10 @@ export default async function Page() {
         <h1 className="text-2xl font-semibold tracking-tight text-stone-800 dark:text-stone-100">
           Clients
         </h1>
-        <CreateClientDialog variant="ghost" />
+        <CreateClientDialog
+          variant="default"
+          className="fixed right-5 bottom-20 rounded-full shadow-lg md:right-8 md:bottom-10 md:h-12 md:w-12"
+        />
       </div>
       <Suspense fallback={<ClientListSkeleton />}>
         {!hasClients && (

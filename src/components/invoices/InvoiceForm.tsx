@@ -37,6 +37,7 @@ export default function InvoiceForm({
   // defaultInvoice passed? then editing is true
   const isEditing = !!defaultInvoice;
   const [clients, setClients] = useState<Client[]>(initialClients);
+  const [nestedOpen, setNestedOpen] = useState(false);
 
   const {
     register,
@@ -113,7 +114,12 @@ export default function InvoiceForm({
               </SelectContent>
             </Select>
           </div>
-          <CreateClientDialog onClientCreated={handleClientCreated} />
+          <CreateClientDialog
+            onNestedOpen={setNestedOpen}
+            onClientCreated={handleClientCreated}
+            className=""
+            variant="ghost"
+          />
         </div>
         {errors.client_name && (
           <p className="mt-1 text-xs text-red-500">
@@ -180,7 +186,7 @@ export default function InvoiceForm({
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type={nestedOpen ? 'button' : 'submit'} disabled={isSubmitting}>
           {isSubmitting
             ? isEditing
               ? 'Saving...'

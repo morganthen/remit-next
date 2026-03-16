@@ -4,13 +4,13 @@ import { useEffect, useRef, useState } from 'react';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { Invoice, Client, Settings } from '@/lib/types';
 import { Button } from '../ui/button';
-import { Bars3Icon } from '@heroicons/react/24/outline';
 import { capitalize } from '@/lib/utils';
 import { markInvoiceOverdue, voidInvoice } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import ActionButton from './ActionButton';
 import EditInvoiceDialog from './EditInvoiceDialog';
+import { EllipsisVerticalIcon } from 'lucide-react';
 
 type InvoiceRowProps = {
   invoice: Invoice;
@@ -25,6 +25,7 @@ export default function InvoiceRow({
 }: InvoiceRowProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -77,6 +78,10 @@ export default function InvoiceRow({
   }, [menuOpen]);
 
   async function handleVoid() {
+    // setVoidOpen(true);
+    // setEditOpen(true);
+    // console.log('handleVoid clicked');
+
     const result = await voidInvoice(invoice.id);
     if (result.success) {
       toast.success('Invoice voided', { position: 'top-center' });
@@ -147,7 +152,7 @@ export default function InvoiceRow({
             setMenuOpen((prev) => !prev);
           }}
         >
-          <Bars3Icon />
+          <EllipsisVerticalIcon />
         </Button>
         {menuOpen && (
           <ActionButton
