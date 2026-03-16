@@ -1,16 +1,50 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { Invoice, Client, Settings } from '@/lib/types';
 import { Button } from '../ui/button';
-import { Bars3Icon } from '@heroicons/react/24/outline';
 import { capitalize } from '@/lib/utils';
-import { markInvoiceOverdue, voidInvoice } from '@/lib/actions';
+import {
+  markInvoiceOverdue,
+  markInvoicePaid,
+  markInvoiceUnpaid,
+  voidInvoice,
+} from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import ActionButton from './ActionButton';
+
+import {
+  BanknoteArrowDown,
+  BanknoteX,
+  Bell,
+  EllipsisVerticalIcon,
+  MessageSquareWarning,
+  Receipt,
+  Send,
+  TicketX,
+  View,
+} from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import Link from 'next/link';
 import EditInvoiceDialog from './EditInvoiceDialog';
+import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 
 type InvoiceRowProps = {
   invoice: Invoice;
@@ -23,10 +57,24 @@ export default function InvoiceRow({
   clients,
   settings,
 }: InvoiceRowProps) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [isEmailing, setIsEmailing] = useState(false);
+  const [isPaying, setIsPaying] = useState(false);
+  const [isUnpaying, setIsUnpaying] = useState(false);
+  const [voiding, setVoiding] = useState(false);
   const router = useRouter();
-  const menuRef = useRef<HTMLDivElement>(null);
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  const invoiceUrl = `${appUrl}/invoice/${invoice.id}`;
+
+  function buildMailBody(
+    template: string | null | undefined,
+    fallback: string
+  ): string {
+    const greeting = `Hi ${invoice.client_name},\n\n`;
+    const body = `${greeting}${template || fallback}\n\nYou can view the invoice here:\nhttp://${invoiceUrl}`;
+    return encodeURIComponent(body);
+  }
 
   function isOverdue(invoice: Invoice): boolean {
     const today = new Date();
@@ -44,49 +92,59 @@ export default function InvoiceRow({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [invoice.id, invoice.status, invoice.due_date]);
 
-  useEffect(() => {
-    if (!menuOpen) {
-      return;
-    }
-
-    function handleClickOutside(event: MouseEvent) {
-      const target = event.target as Node;
-
-      // Ignore clicks inside the menu
-      if (menuRef.current && menuRef.current.contains(target)) {
-        return;
+  async function handleEmailClient(mailtoUrl: string) {
+    if (invoice.status === 'draft') {
+      setIsEmailing(true);
+      const result = await markInvoiceUnpaid(invoice.id);
+      if (result.success) {
+        router.refresh();
+      } else {
+        toast.error(result.error ?? 'Failed to update invoice status');
+        setIsEmailing(false);
+        return; // don't open mailto if update failed
       }
-
-      // Check if click is inside any radix portal (dialogs, alerts, etc.)
-      const portalContainer = (target as Element).closest?.(
-        '[data-radix-portal]'
-      );
-      if (portalContainer) {
-        return;
-      }
-
-      setMenuOpen(false);
+      setIsEmailing(false);
     }
+    window.location.href = mailtoUrl;
+  }
 
-    // Bind event listener only when the menu is open
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      // clean up
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [menuOpen]);
+  async function handleMarkPaid() {
+    setIsPaying(true);
+    const result = await markInvoicePaid(invoice.id);
+    if (result.success) {
+      toast.success('Invoice marked as paid');
+      router.refresh();
+    } else {
+      toast.error(result.error ?? 'Failed to mark as paid');
+    }
+    setIsPaying(false);
+  }
+
+  async function handleMarkUnpaid() {
+    setIsUnpaying(true);
+    const result = await markInvoiceUnpaid(invoice.id);
+    if (result.success) {
+      toast.success('Invoice marked as unpaid');
+      router.refresh();
+    } else {
+      toast.error(result.error ?? 'Failed to mark as unpaid');
+    }
+    setIsUnpaying(false);
+  }
 
   async function handleVoid() {
+    setVoiding(true);
     const result = await voidInvoice(invoice.id);
     if (result.success) {
       toast.success('Invoice voided', { position: 'top-center' });
+      setVoiding(false);
       router.refresh();
     } else {
       toast.error(`Failed to void invoice: ${result.error}`, {
         position: 'top-center',
       });
+      setVoiding(false);
     }
-    setMenuOpen(false);
   }
 
   const statusStyles: Record<string, string> = {
@@ -117,58 +175,210 @@ export default function InvoiceRow({
         </p>
       </div>
       {/*amount and date*/}
-      <div className="col-span-2 col-start-4 flex min-w-6 flex-col items-center justify-center pl-4">
+      <div className="col-span-2 col-start-4 flex min-w-8 flex-col items-center justify-center gap-2 pl-4">
         <p className="text-sm">{formatCurrency(invoice.amount)}</p>
         <p className="text-xs text-stone-400 dark:text-stone-500">
           {formatDate(invoice.due_date)}
         </p>
       </div>
       {/*status*/}
-      <div
-        className={`col-span-2 col-start-6 flex min-w-16 flex-col items-center justify-center rounded-full px-2 py-2 ${isOverdue(invoice) ? statusStyles['overdue'] : statusStyles[invoice.status]}`}
-      >
-        <p className="text-xs">
-          {isOverdue(invoice) ? 'Overdue' : capitalize(invoice.status)}
-        </p>
+      <div className="col-span-2 col-start-6 flex w-full flex-col items-center justify-center">
+        <div
+          className={`flex min-h-8 min-w-16 flex-col items-center justify-center rounded-full px-2 ${isOverdue(invoice) ? statusStyles['overdue'] : statusStyles[invoice.status]}`}
+        >
+          <p className="text-xs">
+            {isOverdue(invoice) ? 'Overdue' : capitalize(invoice.status)}
+          </p>
+        </div>
+        {invoice.status === 'draft' && (
+          <Button
+            size="xs"
+            variant="ghost"
+            className="text-xs"
+            onClick={() =>
+              handleEmailClient(
+                `mailto:${invoice.client_email}?subject=Invoice %23${invoice.inv_num}&body=${buildMailBody(settings?.email_new_invoice, 'Please find your invoice attached. Do not hesitate to reach out if you have any questions.')}`
+              )
+            }
+            disabled={isEmailing}
+          >
+            <PaperAirplaneIcon></PaperAirplaneIcon>
+          </Button>
+        )}
         {invoice.status === 'paid' && invoice.paid_at && (
           <p className="text-center text-xs text-emerald-600">
             {formatDate(invoice.paid_at)}
           </p>
         )}
       </div>
-      {/*action button*/}
-      <div
-        ref={menuRef}
-        className="relative col-span-1 col-end-9 flex justify-end"
-      >
-        <Button
-          variant="outline"
-          onClick={() => {
-            setMenuOpen((prev) => !prev);
-          }}
-        >
-          <Bars3Icon />
-        </Button>
-        {menuOpen && (
-          <ActionButton
-            onVoid={handleVoid}
-            invoiceId={invoice.id}
-            status={invoice.status}
-            invoice={invoice}
-            settings={settings}
-            onEdit={() => {
-              setMenuOpen(false);
-              setEditOpen(true);
-            }}
-          />
-        )}
+      <div className="justify-self-end">
+        <DropdownMenu>
+          <DropdownMenuTrigger disabled={isEmailing}>
+            <EllipsisVerticalIcon />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="max-w-36 min-w-32">
+            <DropdownMenuGroup>
+              <DropdownMenuLabel asChild>
+                <Button
+                  asChild
+                  variant="ghost"
+                  className="w-full border-stone-300 text-sm hover:bg-stone-50 dark:border-stone-600 dark:hover:bg-stone-700"
+                >
+                  <Link href={`/overview/invoices/${invoice.id}`}>
+                    <View></View>View
+                  </Link>
+                </Button>
+              </DropdownMenuLabel>
+              {invoice.status !== 'void' && (
+                <DropdownMenuLabel asChild>
+                  <EditInvoiceDialog
+                    invoice={invoice}
+                    clients={clients}
+                    open={editDialogOpen}
+                    onOpenChange={setEditDialogOpen}
+                  />
+                </DropdownMenuLabel>
+              )}
+              {invoice.client_email &&
+                invoice.status !== 'paid' &&
+                invoice.status !== 'overdue' &&
+                invoice.status !== 'void' && (
+                  <DropdownMenuLabel asChild>
+                    <Button
+                      variant="ghost"
+                      onClick={() =>
+                        handleEmailClient(
+                          `mailto:${invoice.client_email}?subject=Invoice %23${invoice.inv_num}&body=${buildMailBody(settings?.email_new_invoice, 'Please find your invoice attached. Do not hesitate to reach out if you have any questions.')}`
+                        )
+                      }
+                      disabled={isEmailing}
+                      className="w-full border-stone-300 text-center text-sm hover:bg-stone-50 disabled:opacity-50 dark:border-stone-600 dark:hover:bg-stone-700"
+                    >
+                      <Send></Send>
+                      {isEmailing ? 'Sending...' : 'Email'}
+                    </Button>
+                  </DropdownMenuLabel>
+                )}
+              {invoice.client_email && invoice.status === 'overdue' && (
+                <DropdownMenuLabel asChild>
+                  <Button
+                    variant="ghost"
+                    onClick={() =>
+                      handleEmailClient(
+                        `mailto:${invoice.client_email}?subject=Reminder: Invoice %23${invoice.inv_num}&body=${buildMailBody(settings?.email_overdue_reminder, 'This is a friendly reminder that your invoice is now overdue. Please arrange payment at your earliest convenience.')}`
+                      )
+                    }
+                    disabled={isEmailing}
+                    className="w-full border-stone-300 text-sm hover:bg-stone-50 disabled:opacity-50 dark:border-stone-600 dark:hover:bg-stone-700"
+                  >
+                    <Bell></Bell>
+                    Remind
+                  </Button>
+                </DropdownMenuLabel>
+              )}
+              {invoice.client_email && invoice.status === 'paid' && (
+                <DropdownMenuLabel asChild>
+                  <Button
+                    variant="ghost"
+                    onClick={() =>
+                      handleEmailClient(
+                        `mailto:${invoice.client_email}?subject=Receipt: Invoice %23${invoice.inv_num}&body=${buildMailBody(settings?.email_receipt, 'Thank you for your payment. This email confirms receipt of your payment in full.')}`
+                      )
+                    }
+                    disabled={isEmailing}
+                    className="w-full border-stone-300 text-sm hover:bg-stone-50 disabled:opacity-50 dark:border-stone-600 dark:hover:bg-stone-700"
+                  >
+                    <Receipt></Receipt>
+                    Send Receipt
+                  </Button>
+                </DropdownMenuLabel>
+              )}
+              {invoice.client_email && invoice.status === 'void' && (
+                <DropdownMenuLabel asChild>
+                  <Button
+                    variant="ghost"
+                    onClick={() =>
+                      handleEmailClient(
+                        `mailto:${invoice.client_email}?subject=Receipt: Invoice %23${invoice.inv_num}&body=${buildMailBody(settings?.email_void, 'This email is to inform you that the invoice in question is void.')}`
+                      )
+                    }
+                    disabled={isEmailing}
+                    className="w-full border-stone-300 text-sm hover:bg-stone-50 disabled:opacity-50 dark:border-stone-600 dark:hover:bg-stone-700"
+                  >
+                    <MessageSquareWarning></MessageSquareWarning>
+                    Inform
+                  </Button>
+                </DropdownMenuLabel>
+              )}
+              {invoice.status !== 'paid' &&
+                invoice.status !== 'draft' &&
+                invoice.status !== 'void' && (
+                  <DropdownMenuLabel asChild>
+                    <Button
+                      variant="ghost"
+                      className="w-full border-stone-300 text-sm text-green-600 hover:bg-stone-50 dark:border-stone-600 dark:hover:bg-stone-700"
+                      disabled={isPaying}
+                      onClick={handleMarkPaid}
+                    >
+                      <BanknoteArrowDown></BanknoteArrowDown>
+                      {isPaying ? 'Marking...' : 'Mark as Paid'}
+                    </Button>
+                  </DropdownMenuLabel>
+                )}
+              {invoice.status === 'paid' && (
+                <DropdownMenuLabel asChild>
+                  <Button
+                    variant="ghost"
+                    className="w-full border-stone-300 text-sm text-amber-600 hover:bg-stone-50 dark:border-stone-600 dark:hover:bg-stone-700"
+                    disabled={isUnpaying}
+                    onClick={handleMarkUnpaid}
+                  >
+                    <BanknoteX></BanknoteX>
+                    {isUnpaying ? 'Marking...' : 'Mark as Unpaid'}
+                  </Button>
+                </DropdownMenuLabel>
+              )}
 
-        <EditInvoiceDialog
-          invoice={invoice}
-          clients={clients}
-          open={editOpen}
-          onOpenChange={setEditOpen}
-        />
+              {invoice.status !== 'void' && (
+                <DropdownMenuLabel asChild>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="text-destructive w-full hover:bg-stone-50 dark:border-stone-600 dark:hover:bg-stone-700"
+                      >
+                        <TicketX></TicketX>
+                        Void
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Void this invoice?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will mark the invoice as void. It will no longer
+                          appear in your invoice list but will be kept in
+                          records for auditing purposes.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel disabled={voiding}>
+                          Cancel
+                        </AlertDialogCancel>
+                        <Button
+                          variant="destructive"
+                          disabled={voiding}
+                          onClick={handleVoid}
+                        >
+                          {voiding ? 'Voiding...' : 'Void Invoice'}
+                        </Button>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </DropdownMenuLabel>
+              )}
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );

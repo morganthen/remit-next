@@ -89,7 +89,7 @@ export default function Home() {
 
           {/* Desktop/demo column only */}
           <div className="hidden md:flex md:w-1/2 md:justify-center">
-            <div className="demo-card w-[420px] max-w-full md:scale-95">
+            <div className="demo-card w-105 max-w-full md:scale-95">
               <DemoInvoice />
             </div>
           </div>

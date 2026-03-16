@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -25,6 +25,8 @@ type CreateClientDialogProps = {
     name: string;
     email: string;
   }) => void;
+  className: string;
+  onNestedOpen?: Dispatch<SetStateAction<boolean>>;
   variant?:
     | 'outline'
     | 'default'
@@ -36,7 +38,9 @@ type CreateClientDialogProps = {
 
 export default function CreateClientDialog({
   onClientCreated,
-  variant = 'outline',
+  className,
+  onNestedOpen,
+  variant,
 }: CreateClientDialogProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
@@ -66,56 +70,80 @@ export default function CreateClientDialog({
     }
   }
 
+  function openChange() {
+    setOpen((s) => !s);
+    if (onNestedOpen) {
+      onNestedOpen((i) => !i);
+    }
+  }
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button type="button" variant={variant} size="sm">
-          <PlusIcon className="h-4 w-4" />
-          <span className="ml-1">New</span>
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Add New Client</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <Label className="mb-2" htmlFor="name">
-              Name
-            </Label>
-            <Input id="name" {...register('name')} />
-            {errors.name && (
-              <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>
-            )}
-          </div>
-          <div>
-            <Label className="mb-2" htmlFor="email">
-              Email
-            </Label>
-            <Input id="email" type="email" {...register('email')} />
-            {errors.email && (
-              <p className="mt-1 text-xs text-red-500">
-                {errors.email.message}
-              </p>
-            )}
-          </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                reset();
-                setOpen(false);
-              }}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : 'Save Client'}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <div className="z-10">
+      <Dialog open={open} onOpenChange={openChange}>
+        <DialogTrigger asChild>
+          <Button
+            type="button"
+            size="icon-sm"
+            className={className}
+            variant={variant}
+          >
+            <PlusIcon />
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Client</DialogTitle>
+          </DialogHeader>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            onKeyDownCapture={(e) => {
+              if (e.key === 'Enter') {
+                // prevent Enter from bubbling to ancestor forms
+                e.stopPropagation();
+              }
+            }}
+            className="space-y-4"
+          >
+            <div>
+              <Label className="mb-2" htmlFor="name">
+                Name
+              </Label>
+              <Input id="name" {...register('name')} />
+              {errors.name && (
+                <p className="mt-1 text-xs text-red-500">
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <Label className="mb-2" htmlFor="email">
+                Email
+              </Label>
+              <Input id="email" type="email" {...register('email')} />
+              {errors.email && (
+                <p className="mt-1 text-xs text-red-500">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  reset();
+                  setOpen(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? 'Saving...' : 'Save Client'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }
