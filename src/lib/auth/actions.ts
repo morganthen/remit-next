@@ -32,7 +32,7 @@ export async function signup(formData: FormData) {
     return { error: error.message };
   }
 
-  redirect('/login?signup=succuess');
+  redirect('/login?signup=success');
 }
 
 //logout

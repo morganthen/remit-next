@@ -1,5 +1,3 @@
-import InvoiceStatusBadge from './InvoiceStatusBadge';
-
 export default function DemoInvoice() {
   return (
     <div
@@ -29,7 +27,9 @@ export default function DemoInvoice() {
           <p className="text-lg font-semibold text-stone-800 dark:text-stone-100">
             Invoice #002
           </p>
-          <span className="inline-block rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 capitalize dark:bg-blue-900/40 dark:text-blue-300"></span>
+          <span className="inline-block rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 capitalize dark:bg-green-900/40 dark:text-green-300">
+            Paid
+          </span>
         </div>
       </div>
 

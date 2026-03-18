@@ -161,40 +161,50 @@ export default function InvoiceRow({
       id={`invoice-content-${invoice.id}`}
       className="relative mb-2 grid max-w-full grid-cols-[auto_1fr_1fr_1fr_1fr_1fr_1fr_1fr] items-center justify-between gap-x-3 rounded-lg border border-stone-100 bg-white px-5 py-5 shadow-sm transition-all hover:border-stone-300 hover:shadow-md dark:border-stone-700 dark:bg-stone-800 dark:hover:border-stone-500"
     >
-      {/*Invoice Number*/}
-      <div className="col-span-1 col-start-1">
-        <p className="text-xs text-stone-400 dark:text-stone-500">
-          #{invoice.inv_num}
-        </p>
-      </div>
-      {/*Client name and email*/}
-      <div className="col-span-1 col-start-2 min-w-3">
-        <p>{invoice.client_name}</p>
-        <p className="hidden text-xs text-stone-400 lg:block dark:text-stone-500">
-          {invoice.client_email ?? 'No email'}
-        </p>
-      </div>
-      {/*amount and date*/}
-      <div className="col-span-2 col-start-4 flex min-w-8 flex-col items-center justify-center gap-2 pl-4">
-        <p className="text-sm">{formatCurrency(invoice.amount)}</p>
-        <p className="text-xs text-stone-400 dark:text-stone-500">
-          {formatDate(invoice.due_date)}
-        </p>
-      </div>
-      {/*status*/}
-      <div className="col-span-2 col-start-6 flex w-full flex-col items-center justify-center gap-2">
-        <div
-          className={`flex min-h-4 min-w-16 flex-col items-center justify-center rounded-full ${isOverdue(invoice) ? statusStyles['overdue'] : statusStyles[invoice.status]}`}
-        >
-          <p className="text-sm">
-            {isOverdue(invoice) ? 'Overdue' : capitalize(invoice.status)}
+      {/*Invoice Number -> Status (clickable)*/}
+      <Link href={`/overview/invoices/${invoice.id}`} className="contents">
+        <div className="col-span-1 col-start-1">
+          <p className="text-xs text-stone-400 dark:text-stone-500">
+            #{invoice.inv_num}
           </p>
         </div>
+        {/*Client name and email*/}
+        <div className="col-span-1 col-start-2 min-w-3">
+          <p>{invoice.client_name}</p>
+          <p className="hidden text-xs text-stone-400 lg:block dark:text-stone-500">
+            {invoice.client_email ?? 'No email'}
+          </p>
+        </div>
+        {/*amount and date*/}
+        <div className="col-span-2 col-start-4 flex min-w-8 flex-col items-center justify-center gap-2 pl-4">
+          <p className="text-sm">{formatCurrency(invoice.amount)}</p>
+          <p className="text-xs text-stone-400 dark:text-stone-500">
+            {formatDate(invoice.due_date)}
+          </p>
+        </div>
+        {/*status*/}
+        <div className="col-span-2 col-start-6 flex w-full flex-col items-center justify-center gap-2">
+          <div
+            className={`flex min-h-4 min-w-16 flex-col items-center justify-center rounded-full ${isOverdue(invoice) ? statusStyles['overdue'] : statusStyles[invoice.status]}`}
+          >
+            <p className="text-sm">
+              {isOverdue(invoice) ? 'Overdue' : capitalize(invoice.status)}
+            </p>
+          </div>
+
+          {invoice.status === 'paid' && invoice.paid_at && (
+            <p className="hidden text-center text-xs text-emerald-600 lg:inline">
+              {formatDate(invoice.paid_at)}
+            </p>
+          )}
+        </div>
+      </Link>
+
+      <div className="flex justify-self-end">
         {invoice.status === 'draft' && (
           <Button
-            size="xs"
+            size="sm"
             variant="ghost"
-            className="text-xs"
             onClick={() =>
               handleEmailClient(
                 `mailto:${invoice.client_email}?subject=Invoice %23${invoice.inv_num}&body=${buildMailBody(settings?.email_new_invoice, 'Please find your invoice attached. Do not hesitate to reach out if you have any questions.')}`
@@ -205,13 +215,6 @@ export default function InvoiceRow({
             <PaperAirplaneIcon></PaperAirplaneIcon>
           </Button>
         )}
-        {invoice.status === 'paid' && invoice.paid_at && (
-          <p className="hidden text-center text-xs text-emerald-600 lg:inline">
-            {formatDate(invoice.paid_at)}
-          </p>
-        )}
-      </div>
-      <div className="justify-self-end">
         <DropdownMenu>
           <DropdownMenuTrigger disabled={isEmailing}>
             <EllipsisVerticalIcon />
