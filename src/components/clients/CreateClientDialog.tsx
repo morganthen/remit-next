@@ -26,7 +26,7 @@ type CreateClientDialogProps = {
     email: string;
   }) => void;
   className: string;
-  onNestedOpen: Dispatch<SetStateAction<boolean>>;
+  onNestedOpen?: Dispatch<SetStateAction<boolean>>;
   variant?:
     | 'outline'
     | 'default'
