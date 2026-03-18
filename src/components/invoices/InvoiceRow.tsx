@@ -170,7 +170,7 @@ export default function InvoiceRow({
       {/*Client name and email*/}
       <div className="col-span-1 col-start-2 min-w-3">
         <p>{invoice.client_name}</p>
-        <p className="hidden text-xs text-stone-400 md:block dark:text-stone-500">
+        <p className="hidden text-xs text-stone-400 lg:block dark:text-stone-500">
           {invoice.client_email ?? 'No email'}
         </p>
       </div>
@@ -182,11 +182,11 @@ export default function InvoiceRow({
         </p>
       </div>
       {/*status*/}
-      <div className="col-span-2 col-start-6 flex w-full flex-col items-center justify-center">
+      <div className="col-span-2 col-start-6 flex w-full flex-col items-center justify-center gap-2">
         <div
-          className={`flex min-h-8 min-w-16 flex-col items-center justify-center rounded-full px-2 ${isOverdue(invoice) ? statusStyles['overdue'] : statusStyles[invoice.status]}`}
+          className={`flex min-h-4 min-w-16 flex-col items-center justify-center rounded-full ${isOverdue(invoice) ? statusStyles['overdue'] : statusStyles[invoice.status]}`}
         >
-          <p className="text-xs">
+          <p className="text-sm">
             {isOverdue(invoice) ? 'Overdue' : capitalize(invoice.status)}
           </p>
         </div>
@@ -206,7 +206,7 @@ export default function InvoiceRow({
           </Button>
         )}
         {invoice.status === 'paid' && invoice.paid_at && (
-          <p className="text-center text-xs text-emerald-600">
+          <p className="hidden text-center text-xs text-emerald-600 lg:inline">
             {formatDate(invoice.paid_at)}
           </p>
         )}
