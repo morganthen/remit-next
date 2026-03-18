@@ -47,16 +47,16 @@ export default function ClientRow({ client }: { client: Client }) {
   }
 
   return (
-    <div className="relative mb-2 grid max-w-full min-w-4 grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] items-center justify-between gap-x-3 rounded-lg border border-stone-100 bg-white px-5 py-5 shadow-sm transition-all hover:border-stone-300 hover:shadow-md md:min-w-full dark:border-stone-700 dark:bg-stone-800 dark:hover:border-stone-500">
+    <div className="relative mb-2 grid w-full max-w-full grid-cols-[auto_1fr_auto] items-center justify-between gap-x-8 rounded-lg border border-stone-100 bg-white px-5 py-5 shadow-sm transition-all hover:border-stone-300 hover:shadow-md dark:border-stone-700 dark:bg-stone-800 dark:hover:border-stone-500">
       {/*Client name and email*/}
-      <div className="col-span-2 col-start-1 flex flex-col">
+      <div className="col-span-1 col-start-1 flex flex-col">
         <p>{client.name}</p>
       </div>
-      <div className="col-span-2 col-start-4 flex items-center justify-center text-xs text-stone-400">
-        <p>{client.email}</p>
+      <div className="col-span-1 col-start-2 flex w-full text-center text-xs text-stone-400">
+        <p className="mx-auto">{client.email}</p>
       </div>
 
-      <div className="relative col-span-1 col-end-9 flex justify-end">
+      <div className="relative col-span-1 col-start-3 flex justify-end">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">

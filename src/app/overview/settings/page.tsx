@@ -16,7 +16,11 @@ export default async function SettingsPage() {
           Settings
         </h1>
       </div>
-      <SettingsForm settings={settings} userEmail={user?.email ?? ''} />
+      <SettingsForm
+        userId={user?.id}
+        settings={settings}
+        userEmail={user?.email ?? ''}
+      />
     </div>
   );
 }

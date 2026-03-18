@@ -6,10 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const searchParams = useSearchParams();
+  const signupSuccess = searchParams.get('signup') === 'success';
 
   async function handleSubmit(formData: FormData) {
     setError(null);
@@ -43,12 +46,19 @@ export default function LoginPage() {
             {isPending ? 'Logging in...' : 'Log In'}
           </Button>
         </form>
-        <p className="mt-4 text-center text-sm text-stone-500 dark:text-stone-400">
-          Don&apos;t have an account?{' '}
-          <Link href="/signup" className="text-blue-600 hover:underline">
-            Sign up
-          </Link>
-        </p>
+        {signupSuccess && (
+          <p className="text-muted-foreground mt-4 text-xs">
+            Check your email for verification before logging in 😊
+          </p>
+        )}
+        {!signupSuccess && (
+          <p className="mt-4 text-center text-sm text-stone-500 dark:text-stone-400">
+            Don&apos;t have an account?{' '}
+            <Link href="/signup" className="text-blue-600 hover:underline">
+              Sign up
+            </Link>
+          </p>
+        )}
       </div>
     </div>
   );

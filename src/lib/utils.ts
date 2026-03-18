@@ -32,17 +32,21 @@ export function rollingAverageIncome(invoices: Invoice[]): number {
   const now = new Date();
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(now.getDate() - 6);
-  sevenDaysAgo.setHours(0, 0, 0, 0); // start of day 7 days ago
+  sevenDaysAgo.setHours(0, 0, 0, 0);
 
   const recent = invoices.filter((inv) => {
-    const createdAt = new Date(inv.created_at);
+    const dateStr = inv.paid_at ?? inv.created_at;
+    const date = new Date(dateStr);
     return (
-      inv.status === 'paid' && createdAt >= sevenDaysAgo && createdAt <= now
+      inv.status === 'paid' &&
+      !isNaN(date.getTime()) &&
+      date >= sevenDaysAgo &&
+      date <= now
     );
   });
 
   if (!recent.length) return 0;
 
-  const total = recent.reduce((sum, inv) => sum + inv.amount, 0);
+  const total = recent.reduce((sum, inv) => sum + Number(inv.amount || 0), 0);
   return total / 7;
 }

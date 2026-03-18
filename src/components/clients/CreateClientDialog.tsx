@@ -26,7 +26,7 @@ type CreateClientDialogProps = {
     email: string;
   }) => void;
   className: string;
-  onNestedOpen?: Dispatch<SetStateAction<boolean>>;
+  onNestedOpen: Dispatch<SetStateAction<boolean>>;
   variant?:
     | 'outline'
     | 'default'
@@ -37,9 +37,9 @@ type CreateClientDialogProps = {
 };
 
 export default function CreateClientDialog({
+  onNestedOpen,
   onClientCreated,
   className,
-  onNestedOpen,
   variant,
 }: CreateClientDialogProps) {
   const [open, setOpen] = useState(false);
@@ -69,14 +69,10 @@ export default function CreateClientDialog({
       });
     }
   }
-
-  function openChange() {
-    setOpen((s) => !s);
-    if (onNestedOpen) {
-      onNestedOpen((i) => !i);
-    }
+  function openChange(value: boolean) {
+    setOpen(value);
+    onNestedOpen?.(value);
   }
-
   return (
     <div className="z-10">
       <Dialog open={open} onOpenChange={openChange}>
@@ -95,12 +91,9 @@ export default function CreateClientDialog({
             <DialogTitle>Add New Client</DialogTitle>
           </DialogHeader>
           <form
-            onSubmit={handleSubmit(onSubmit)}
-            onKeyDownCapture={(e) => {
-              if (e.key === 'Enter') {
-                // prevent Enter from bubbling to ancestor forms
-                e.stopPropagation();
-              }
+            onSubmit={(e) => {
+              e.stopPropagation();
+              handleSubmit(onSubmit)(e);
             }}
             className="space-y-4"
           >

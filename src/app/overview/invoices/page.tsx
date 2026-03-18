@@ -53,6 +53,7 @@ export default async function InvoicesPage({
             </div>
           </div>
         )}
+
         {hasInvoice && (
           <InvoicesList showVoid={showVoid} status={status} search={search} />
         )}

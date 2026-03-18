@@ -30,6 +30,7 @@ export const settingsSchema = z.object({
   email_new_invoice: z.string().optional(),
   email_overdue_reminder: z.string().optional(),
   email_receipt: z.string().optional(),
+  email_void: z.string().optional(),
 });
 
 export type SettingsFormData = z.infer<typeof settingsSchema>;

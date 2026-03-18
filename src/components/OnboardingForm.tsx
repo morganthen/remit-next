@@ -36,6 +36,8 @@ export default function OnboardingForm() {
         'This is a friendly reminder that your invoice is now overdue. Please arrange payment at your earliest convenience.',
       email_receipt:
         'Thank you for your payment. This email confirms receipt of your payment in full.',
+      email_void:
+        'This email is to inform you that the invoice in question is void.',
     },
   });
 

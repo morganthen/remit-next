@@ -32,7 +32,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const authPaths = ['/login', '/signup'];
-  const publicPaths = [...authPaths, '/invoice', '/'];
+  const publicPaths = [...authPaths, '/invoice'];
   const isPublicPath = publicPaths.some((path) => pathname.startsWith(path));
   const isAuthPath = authPaths.some((path) => pathname.startsWith(path));
 
@@ -46,7 +46,7 @@ export async function middleware(request: NextRequest) {
   // Logged in + trying to access login/signup (not /invoice) → root
   if (user && isAuthPath) {
     const url = request.nextUrl.clone();
-    url.pathname = '/overview';
+    url.pathname = '/';
     return NextResponse.redirect(url);
   }
 

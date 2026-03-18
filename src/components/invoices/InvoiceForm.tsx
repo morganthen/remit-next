@@ -37,6 +37,7 @@ export default function InvoiceForm({
   // defaultInvoice passed? then editing is true
   const isEditing = !!defaultInvoice;
   const [clients, setClients] = useState<Client[]>(initialClients);
+
   const [nestedOpen, setNestedOpen] = useState(false);
 
   const {
@@ -76,7 +77,13 @@ export default function InvoiceForm({
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="space-y-4"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' && !nestedOpen) e.preventDefault();
+      }}
+    >
       {/* Invoice number — read only */}
       <div>
         <Label className="mb-2">Invoice Number</Label>
@@ -186,7 +193,7 @@ export default function InvoiceForm({
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button type={nestedOpen ? 'button' : 'submit'} disabled={isSubmitting}>
+        <Button type="submit" disabled={isSubmitting}>
           {isSubmitting
             ? isEditing
               ? 'Saving...'
