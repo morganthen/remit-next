@@ -94,6 +94,16 @@ export default async function InvoicePage({
               {new Date(invoice.due_date).toLocaleDateString()}
             </p>
           </div>
+          {invoice.paid_at && (
+            <div>
+              <p className="mb-1 text-xs font-semibold tracking-widest text-emerald-500 uppercase">
+                Paid On
+              </p>
+              <p className="text-sm text-stone-800 dark:text-stone-100">
+                {new Date(invoice.paid_at).toLocaleDateString()}
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="mb-8 rounded-lg bg-stone-50 px-6 py-4 dark:bg-stone-800">
