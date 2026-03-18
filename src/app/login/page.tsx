@@ -1,65 +1,10 @@
-'use client';
-
-import { useState, useTransition } from 'react';
-import { login } from '@/lib/auth/actions';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
+import LoginForm from '@/components/login/LoginForm';
 
 export default function LoginPage() {
-  const [error, setError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
-  const searchParams = useSearchParams();
-  const signupSuccess = searchParams.get('signup') === 'success';
-
-  async function handleSubmit(formData: FormData) {
-    setError(null);
-    startTransition(async () => {
-      const result = await login(formData);
-      if (result?.error) {
-        setError(result.error);
-      }
-    });
-  }
-
   return (
-    <div className="flex min-h-screen items-center justify-center bg-stone-50 dark:bg-stone-950">
-      <div className="w-full max-w-sm rounded-lg border border-stone-200 bg-white p-8 shadow-sm dark:border-stone-700 dark:bg-stone-900">
-        <h1 className="mb-6 text-center text-2xl font-semibold">Log In</h1>
-        <form action={handleSubmit} className="space-y-4">
-          <div>
-            <Label className="mb-2" htmlFor="email">
-              Email
-            </Label>
-            <Input id="email" name="email" type="email" required />
-          </div>
-          <div>
-            <Label className="mb-2" htmlFor="password">
-              Password
-            </Label>
-            <Input id="password" name="password" type="password" required />
-          </div>
-          {error && <p className="text-sm text-red-500">{error}</p>}
-          <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? 'Logging in...' : 'Log In'}
-          </Button>
-        </form>
-        {signupSuccess && (
-          <p className="text-muted-foreground mt-4 text-xs">
-            Check your email for verification before logging in 😊
-          </p>
-        )}
-        {!signupSuccess && (
-          <p className="mt-4 text-center text-sm text-stone-500 dark:text-stone-400">
-            Don&apos;t have an account?{' '}
-            <Link href="/signup" className="text-blue-600 hover:underline">
-              Sign up
-            </Link>
-          </p>
-        )}
-      </div>
-    </div>
+    <Suspense fallback={<div className="min-h-screen" />}>
+      <LoginForm />
+    </Suspense>
   );
 }
