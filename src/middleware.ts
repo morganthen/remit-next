@@ -32,21 +32,21 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const authPaths = ['/login', '/signup'];
-  const publicPaths = [...authPaths, '/invoice', '/'];
+  const publicPaths = [...authPaths, '/invoice'];
   const isPublicPath = publicPaths.some((path) => pathname.startsWith(path));
   const isAuthPath = authPaths.some((path) => pathname.startsWith(path));
 
-  // Not logged in → login page (something has to be wrong here, looks like a redirect loop)
-  if (!user && !isPublicPath) {
+  // Not logged in -> only allow public paths, otherwise send to login
+  if (!user && !isPublicPath && pathname !== '/') {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
   }
 
   // Logged in + trying to access login/signup (not /invoice) → root
-  if (user && isAuthPath) {
+  if (user && (pathname === '/' || isAuthPath)) {
     const url = request.nextUrl.clone();
-    url.pathname = '/';
+    url.pathname = '/overview';
     return NextResponse.redirect(url);
   }
 
