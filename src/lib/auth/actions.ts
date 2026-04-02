@@ -45,6 +45,10 @@ export async function logout() {
 //delete user
 
 function isAdmin(user: any) {
+  // point of study:
+  // RBAC (Role Based Access Control))
+  // Consider if you can include authorisation along with authentication
+  // This will also mean you can change admins without a redeploy
   const admins = (process.env.ADMIN_EMAILS ?? '')
     .split(',')
     .map((s) => s.trim());
@@ -69,8 +73,10 @@ export async function deleteUser(formData: FormData) {
 
   const adminSupabase = await adminCreateClient();
 
+  // Example of a good comment: not easy to represent this with code alone:
   // Remove dependent rows in `public.settings` that reference this user.
   // This avoids FK constraint failures when deleting the auth user.
+  // point of study: referential integrity and cascading deletes
   try {
     const tables = ['todos', 'work_sessions', 'settings'];
 

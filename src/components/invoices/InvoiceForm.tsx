@@ -17,6 +17,7 @@ import {
 import CreateClientDialog from '@/components/clients/CreateClientDialog';
 import { Client, Invoice } from '@/lib/types';
 
+// suggest creating a union type and associated values array for this in a separate file
 const STATUSES = ['draft', 'unpaid', 'paid', 'overdue', 'void'] as const;
 
 type InvoiceFormProps = {

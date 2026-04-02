@@ -6,6 +6,10 @@ Remit is a lightweight, responsive invoicing dashboard built for freelancers who
 
 ![screenshot](public/screenshots/remit-v3.png)
 
+## 📌 Status
+
+Remit is a working MVP currently in active personal use. Core invoicing workflows are stable. Planned improvements include automated overdue detection, email notifications, and expanded reporting.
+
 ---
 
 ## 🚀 Key Features
@@ -53,6 +57,13 @@ The toughest part of this project wasn't writing features — it was understandi
 **Void-Over-Delete: A Business Logic Decision**
 Early on, I implemented hard invoice deletion. I later realised this was the wrong call because deleting financial records creates gaps in your audit trail, which is a real problem at tax time. I refactored to a void status instead, preserving the full history of every invoice while clearly marking cancelled ones. It was a small schema change with a large real-world implication, and it pushed me to think about the _business correctness_ of the app, not just its technical correctness.
 
+Reviewer note - in your case you have utilised a status field, there is also soft-deletion as an approach.
+
+Potential points of study:
+* Soft deletion
+* Immutable Ledgers
+* Double-entry bookkeeping
+
 **Nested Dialogs & Form Submission**
 Adding a seemingly simple feature i.e a form inside a modal, triggered from within another modal turned into two days of debugging. Radix UI's dialog components have specific behaviour around focus trapping and portal rendering that doesn't play well with nested compositions out of the box. Solving it required understanding the underlying DOM and event propagation at a level I hadn't previously needed to. A useful reminder that UI complexity compounds quickly.
 
@@ -64,7 +75,7 @@ Custom action menus inside a clipped table layout caused dropdowns to render beh
 ## 💡 Lessons Learned
 
 **Full-stack thinking is a different discipline.**
-Building Remit end-to-end forced me to make decisions I'd previously left to someone else. For example, how to structure the database, where to validate data, which logic belongs on the server vs. the client. I came away with a much stronger sense of how the layers of a full-stack app interact, and why those boundaries matter for security, performance, and maintainability.
+Building Remit end-to-end forced me to make decisions I'd previously not had experience with. For example, how to structure the database, where to validate data, which logic belongs on the server vs. the client. I came away with a much stronger sense of how the layers of a full-stack app interact, and why those boundaries matter for security, performance, and maintainability.
 
 **TypeScript pays off under pressure.**
 There were moments where TypeScript felt like friction and overly verbose. Especially when wiring up Supabase-generated types with form schemas and server action responses. But every time I refactored something or changed a data shape, the type errors caught real mistakes before they hit the UI. The upfront cost is real but so is the result.
@@ -74,6 +85,3 @@ Configuring Row-Level Security in Supabase wasn't just about checking a box — 
 
 ---
 
-## 📌 Status
-
-Remit is a working MVP currently in active personal use. Core invoicing workflows are stable. Planned improvements include automated overdue detection, email notifications, and expanded reporting.

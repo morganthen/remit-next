@@ -273,6 +273,13 @@ export default function SettingsForm({
           </Button>
         </div>
       </form>
+      {/* you will find some workplaces wont mind, and in personal code do what you like, but generally try and keep the code and comments professional.
+        I've seen bugs where somebody tried to name something cleverly to make a joke,
+        but then the variable got missed in a refactor because of the naming and caused issues.
+
+        https://www.youtube.com/shorts/CXjU4SL-MT4
+        or the longer version https://www.youtube.com/watch?v=mHEVLndYvko
+       */}
       {/*danger zOOoone*/}
       <section className="w-full">
         <SectionHeader
