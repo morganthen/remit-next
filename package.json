@@ -2,6 +2,11 @@
   "name": "remit-next",
   "version": "0.1.0",
   "private": true,
+  // https://docs.npmjs.com/cli/v11/configuring-npm/package-json#engines
+  // https://nextjs.org/docs/pages/getting-started/installation#system-requirements
+  "engines": {
+    "node": ">=20.9"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -24,6 +29,8 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-hook-form": "^7.71.2",
+    // Not a big issue, but worth noting there is discussion in the industry at the moment about whether designers should use toasts at all, due to issues with accessibility
+    // https://primer.style/accessibility/patterns/accessible-notifications-and-messages/#toasts
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
     "zod": "^4.3.6"

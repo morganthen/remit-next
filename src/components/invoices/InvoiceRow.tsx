@@ -64,6 +64,8 @@ export default function InvoiceRow({
   const [voiding, setVoiding] = useState(false);
   const router = useRouter();
 
+  // this logic might be good to centralise somewhere,
+  // something like "getAppUrl(path, options)"
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
   const invoiceUrl = `${appUrl}/invoice/${invoice.id}`;
 
@@ -76,6 +78,9 @@ export default function InvoiceRow({
     return encodeURIComponent(body);
   }
 
+  // I notice there are a lot of operations that relate to invoices
+  // Object oriented programming could be a good way to group related data and functions together,
+  // This could help keep the code organized and make it easier to work with invoices throughout the codebase.
   function isOverdue(invoice: Invoice): boolean {
     const today = new Date();
     const due = new Date(invoice.due_date);
@@ -92,6 +97,8 @@ export default function InvoiceRow({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [invoice.id, invoice.status, invoice.due_date]);
 
+  // this is probably my lack of domain understanding,
+  // but having an "email client" function that mutates invoice state doesn't make sense to me
   async function handleEmailClient(mailtoUrl: string) {
     if (invoice.status === 'draft') {
       setIsEmailing(true);
@@ -247,6 +254,9 @@ export default function InvoiceRow({
                 invoice.status !== 'overdue' &&
                 invoice.status !== 'void' && (
                   <DropdownMenuLabel asChild>
+                    {/* might make more sense to pass the invoice object directly to the function
+                      rather than keeping the mailto builder logic within the UI markup
+                    */}
                     <Button
                       variant="ghost"
                       onClick={() =>

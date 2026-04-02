@@ -4,6 +4,8 @@ import { adminCreateClient, createClient } from '@/lib/supabase/server';
 
 export async function POST(request: Request) {
   try {
+    // use descriptive names, "ct" isn't immediately clear as "content type"
+    // "const contentType" is fine
     const ct = request.headers.get('content-type') || '';
     let id: string | undefined;
 

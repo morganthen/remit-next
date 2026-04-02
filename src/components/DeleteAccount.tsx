@@ -19,8 +19,15 @@ export default function DeleteAccountDialog({
 }) {
   const [loading, setLoading] = useState(false);
   async function handleDelete() {
-    if (!userId) return console.error('No user id');
+    // returning console.error seems strange, console.error returns void
+    if (!userId) {
+      console.error('No user id');
+      return;
+    }
     setLoading(true);
+    // This function probably works, but it doesn't seem like idiomatic React
+    // (manually setting window.location within a function that is also doing a fetch)
+    // My React is a little rusty, Try asking AI how it might refactor this to be more idiomatic
     try {
       const form = new FormData();
       form.append('id', userId);

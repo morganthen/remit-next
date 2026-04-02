@@ -13,6 +13,11 @@ export async function voidInvoice(
       data: { user },
     } = await supabase.auth.getUser();
 
+    // very similar logic to some of the function in data.ts
+    // consider how you might refactor to avoid repetition and keep 
+    // the behaviour and approaches in your code consistent.
+    // Point of study:
+    // Avoid exceptions as control flow
     if (!user) return { success: false, error: 'Not authenticated' };
 
     const { data, error } = await supabase
@@ -36,6 +41,9 @@ export async function voidInvoice(
     const errorMessage =
       e instanceof Error ? e.message : 'An unknown error occurred';
     console.error('Void invoice exception:', errorMessage);
+    // Point of study (but don't worry if it makes no sense yet):
+    // Monads and the "Either" (aka Result type) + "Maybe" types (aka Option type)
+    // personal opinion: see Golang and VisualBasic for how NOT to do error handling
     return { success: false, error: errorMessage };
   }
 }
@@ -83,6 +91,12 @@ export async function createInvoice(
   if (!user) return { success: false, error: 'Not authenticated' };
 
   // Get next invoice number
+  // Point of study:
+  // * Race conditions with integer indexes
+  // * unique identifiers (UUID)
+  // * Locking mechanisms (semaphores, mutexes)
+  // If you can, wrap this in a transaction to avoid race conditions
+  // Though maybe supabase doesn't support transactions?
   const { data: lastInvoice } = await supabase
     .from('invoices')
     .select('inv_num')
@@ -261,6 +275,7 @@ export async function markInvoiceUnpaid(
     .eq('user_id', user.id)
     .select();
 
+  // this logic is repeated, consider refactoring and separating data layer from business logic
   if (error) {
     return { success: false, error: error.message };
   }

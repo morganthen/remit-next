@@ -42,6 +42,7 @@ export async function getInvoices({
   if (search) {
     // Check if search looks like a number — if so, filter by inv_num directly
     const searchAsNumber = parseInt(search, 10);
+    // point of study: parameterized queries and SQL injection
     if (!isNaN(searchAsNumber)) {
       query = query.or(
         `client_name.ilike.%${search}%,inv_num.eq.${searchAsNumber}`
@@ -81,7 +82,8 @@ export async function getRecentInvoices(): Promise<Invoice[]> {
     .eq('user_id', user.id)
     .neq('status', 'void')
     .order('inv_num', { ascending: false })
-    .limit(5);
+    .limit(5); // point of study: Magic numbers
+    // https://en.wikipedia.org/wiki/Magic_number_(programming)
 
   if (error) {
     console.error(error);
@@ -102,6 +104,8 @@ export async function getInvoiceCount(): Promise<number> {
   return count ?? 0;
 }
 
+// consider the range of functions available in this file:
+// do they all belong together? are they all at the same level of abstraction? are they all related to the same domain? if not, consider splitting them into separate files or modules. 
 export async function getClients(): Promise<Client[]> {
   const { supabase, user } = await getSupabaseWithUser();
 
@@ -230,5 +234,7 @@ export async function getPublicSettingsByUserId(
     .single();
 
   if (error || !data) return null;
+  // avoid this kind of casting if possible
+  // though sometimes you can't help it, library code won't always play ball
   return data as unknown as Settings;
 }
