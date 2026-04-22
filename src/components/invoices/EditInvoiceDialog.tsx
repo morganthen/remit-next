@@ -12,7 +12,6 @@ import { updateInvoice } from '@/lib/actions';
 import { Client, Invoice } from '@/lib/types';
 import { InvoiceFormData } from '@/lib/schemas';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 import { Button } from '../ui/button';
 import { Pencil } from 'lucide-react';
 
@@ -29,14 +28,11 @@ export default function EditInvoiceDialog({
   open,
   onOpenChange,
 }: EditInvoiceDialogProps) {
-  const router = useRouter();
-
   async function handleSubmit(data: InvoiceFormData) {
     const result = await updateInvoice(invoice.id, data);
     if (result.success) {
       toast.success('Invoice updated');
       onOpenChange(false);
-      router.refresh();
     } else {
       toast.error(result.error ?? 'Failed to update invoice');
     }

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { clientSchema, ClientFormData } from '@/lib/schemas';
@@ -34,7 +33,6 @@ export default function EditClientDialog({
   client,
 }: EditClientDialogProps) {
   const [open, setOpen] = useState(false);
-  const router = useRouter();
 
   const {
     register,
@@ -55,7 +53,6 @@ export default function EditClientDialog({
     if (result.success) {
       toast.success('Client updated successfully', { position: 'top-center' });
       setOpen(false);
-      router.refresh();
     } else {
       toast.error(`Failed to update client: ${result.error}`, {
         position: 'top-center',

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import {
@@ -34,7 +33,6 @@ export default function CreateInvoiceButton({
   className,
 }: CreateInvoiceButtonProps) {
   const [open, setOpen] = useState(false);
-  const router = useRouter();
 
   async function handleCreate(data: InvoiceFormData) {
     const result = await createInvoice(data);
@@ -42,7 +40,6 @@ export default function CreateInvoiceButton({
     if (result.success) {
       toast.success('Invoice created successfully', { position: 'top-center' });
       setOpen(false);
-      router.refresh();
     } else {
       toast.error(`Failed to create invoice: ${result.error}`, {
         position: 'top-center',

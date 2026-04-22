@@ -2,7 +2,6 @@
 
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { clientSchema, ClientFormData } from '@/lib/schemas';
 import { createNewClient } from '@/lib/actions';
@@ -43,7 +42,6 @@ export default function CreateClientDialog({
   variant,
 }: CreateClientDialogProps) {
   const [open, setOpen] = useState(false);
-  const router = useRouter();
 
   const {
     register,
@@ -62,7 +60,6 @@ export default function CreateClientDialog({
       onClientCreated?.(result.client);
       reset();
       setOpen(false);
-      router.refresh();
     } else {
       toast.error(`Failed to create client: ${result.error}`, {
         position: 'top-center',

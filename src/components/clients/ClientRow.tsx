@@ -5,7 +5,6 @@ import { Button } from '../ui/button';
 import { Client } from '@/lib/types';
 import EditClientDialog from './EditClientDialog';
 import { deleteClient } from '@/lib/actions';
-import { useRouter } from 'next/navigation';
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -30,7 +29,6 @@ import { EllipsisVertical, Trash } from 'lucide-react';
 export default function ClientRow({ client }: { client: Client }) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const router = useRouter();
 
   async function handleDelete() {
     setIsDeleting(true);
@@ -38,7 +36,6 @@ export default function ClientRow({ client }: { client: Client }) {
 
     if (result.success) {
       toast.success('Client deleted');
-      router.refresh();
       setIsDeleting(false);
     } else {
       toast.error(result.error ?? 'Failed to delete client');
