@@ -3,6 +3,7 @@ import InvoicesList from '@/components/invoices/InvoicesList';
 import CreateInvoiceButtonWrapper from '@/components/invoices/CreateInvoiceButtonWrapper';
 import ShowVoidToggle from '@/components/invoices/ShowVoidToggle';
 import { InvoicesListSkeleton } from '@/components/invoices/InvoicesListSkeleton';
+import { InvoicesPageBodySkeleton } from '@/components/invoices/InvoicesPageBodySkeleton';
 import FilterBar from '@/components/FilterBar';
 import { getInvoiceCount } from '@/lib/data';
 import { DocumentPlusIcon } from '@heroicons/react/24/outline';
@@ -35,31 +36,6 @@ async function ShowVoidToggleSlot() {
   const count = await getInvoiceCount();
   if (count === 0) return null;
   return <ShowVoidToggle />;
-}
-
-function FilterBarSkeleton() {
-  return (
-    <div className="mb-4 flex w-full flex-col gap-2">
-      <div className="flex gap-1">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div
-            key={i}
-            className="h-7 w-14 animate-pulse rounded-full bg-stone-100 dark:bg-stone-800"
-          />
-        ))}
-      </div>
-      <div className="h-9 w-full animate-pulse rounded-md bg-stone-100 dark:bg-stone-800" />
-    </div>
-  );
-}
-
-function InvoicesPageBodySkeleton() {
-  return (
-    <>
-      <FilterBarSkeleton />
-      <InvoicesListSkeleton />
-    </>
-  );
 }
 
 async function InvoicesPageBody({

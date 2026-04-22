@@ -1,12 +1,11 @@
-import { getClients } from '@/lib/data';
+import { Client } from '@/lib/types';
 import ClientRow from './ClientRow';
 
-export default async function ClientsList() {
-  const clients = await getClients();
+export default function ClientsList({ clients }: { clients: Client[] }) {
   return (
     <div className="max-h-[70vh] overflow-y-auto px-4">
       <ul className="w-full">
-        {clients?.map((client) => (
+        {clients.map((client) => (
           <li key={client.id}>
             <ClientRow client={client} />
           </li>

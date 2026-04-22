@@ -185,7 +185,7 @@ export async function getInvoiceById(id: string): Promise<Invoice | null> {
   return data as Invoice;
 }
 
-export async function getSettings(): Promise<Settings | null> {
+export const getSettings = cache(async (): Promise<Settings | null> => {
   const { supabase, user } = await getSupabaseWithUser();
 
   const { data, error } = await supabase
@@ -196,7 +196,7 @@ export async function getSettings(): Promise<Settings | null> {
 
   if (error || !data) return null;
   return data as Settings;
-}
+});
 
 // Public functions — no auth required, used for shareable invoice links
 export async function getPublicInvoiceById(
