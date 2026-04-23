@@ -53,7 +53,17 @@ type InvoiceRowActionsProps = {
 type OptimisticAction =
   | { type: 'paid' }
   | { type: 'unpaid' }
-  | { type: 'void' };
+  | { type: 'void' }
+  | {
+      type: 'edit';
+      data: {
+        client_name: string;
+        client_email: string;
+        amount: number;
+        due_date: string;
+        status: Invoice['status'];
+      };
+    };
 
 function optimisticReducer(
   state: Invoice,
@@ -66,6 +76,16 @@ function optimisticReducer(
       return { ...state, status: 'unpaid', paid_at: null };
     case 'void':
       return { ...state, status: 'void' };
+    case 'edit': {
+      // Mirror server-side paid_at logic from updateInvoice
+      const paid_at =
+        action.data.status === 'paid'
+          ? state.status === 'paid' && state.paid_at
+            ? state.paid_at
+            : new Date().toISOString()
+          : null;
+      return { ...state, ...action.data, paid_at };
+    }
   }
 }
 
@@ -227,6 +247,9 @@ export default function InvoiceRowActions({
                     clients={clients}
                     open={editDialogOpen}
                     onOpenChange={setEditDialogOpen}
+                    onOptimisticEdit={(data) =>
+                      addOptimistic({ type: 'edit', data })
+                    }
                   />
                 </DropdownMenuLabel>
               )}

@@ -43,12 +43,29 @@ export default function CreateClientDialog({
   const [open, setOpen] = useState(false);
 
   async function onSubmit(data: ClientFormData) {
-    const result = await createNewClient(data);
+    if (onClientCreated) {
+      // Inline mode (used inside InvoiceForm) — wait for the server so we can
+      // hand the real client (with its server-assigned id) back to the caller.
+      const result = await createNewClient(data);
+      if (result.success && result.client) {
+        toast.success('Client created successfully', {
+          position: 'top-center',
+        });
+        onClientCreated(result.client);
+        setOpen(false);
+      } else {
+        toast.error(`Failed to create client: ${result.error}`, {
+          position: 'top-center',
+        });
+      }
+      return;
+    }
 
-    if (result.success && result.client) {
+    // Standalone mode — close immediately, run the server in the background.
+    setOpen(false);
+    const result = await createNewClient(data);
+    if (result.success) {
       toast.success('Client created successfully', { position: 'top-center' });
-      onClientCreated?.(result.client);
-      setOpen(false);
     } else {
       toast.error(`Failed to create client: ${result.error}`, {
         position: 'top-center',

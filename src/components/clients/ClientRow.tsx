@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { Button } from '../ui/button';
 import { Client } from '@/lib/types';
 import EditClientDialog from './EditClientDialog';
@@ -26,21 +26,31 @@ import {
 } from '../ui/dropdown-menu';
 import { EllipsisVertical, Trash } from 'lucide-react';
 
-export default function ClientRow({ client }: { client: Client }) {
+type ClientRowProps = {
+  client: Client;
+  onOptimisticDelete: (id: string) => void;
+  onOptimisticEdit: (id: string, data: { name: string; email: string }) => void;
+};
+
+export default function ClientRow({
+  client,
+  onOptimisticDelete,
+  onOptimisticEdit,
+}: ClientRowProps) {
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
-  async function handleDelete() {
-    setIsDeleting(true);
-    const result = await deleteClient(client.id);
+  function handleDelete() {
+    startTransition(async () => {
+      onOptimisticDelete(client.id);
+      const result = await deleteClient(client.id);
 
-    if (result.success) {
-      toast.success('Client deleted');
-      setIsDeleting(false);
-    } else {
-      toast.error(result.error ?? 'Failed to delete client');
-      setIsDeleting(false);
-    }
+      if (result.success) {
+        toast.success('Client deleted');
+      } else {
+        toast.error(result.error ?? 'Failed to delete client');
+      }
+    });
   }
 
   return (
@@ -63,7 +73,11 @@ export default function ClientRow({ client }: { client: Client }) {
           <DropdownMenuContent className="w-36">
             <DropdownMenuGroup>
               <DropdownMenuLabel asChild>
-                <EditClientDialog client={client} isDeleting={isDeleting} />
+                <EditClientDialog
+                  client={client}
+                  isDeleting={isPending}
+                  onOptimisticEdit={onOptimisticEdit}
+                />
               </DropdownMenuLabel>
 
               <DropdownMenuLabel asChild>
@@ -72,7 +86,7 @@ export default function ClientRow({ client }: { client: Client }) {
                     <Button
                       variant="ghost"
                       className="w-full border-stone-300 text-center text-sm text-red-600 hover:bg-stone-50 dark:border-stone-600 dark:hover:bg-stone-700"
-                      disabled={isDeleting}
+                      disabled={isPending}
                     >
                       <Trash></Trash>
                       Delete

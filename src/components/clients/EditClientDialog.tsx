@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import dynamic from 'next/dynamic';
 import { ClientFormData } from '@/lib/schemas';
 import { updateClient } from '@/lib/actions';
@@ -24,25 +24,33 @@ type EditClientDialogProps = {
     email: string;
   };
   isDeleting: boolean;
+  onOptimisticEdit: (id: string, data: { name: string; email: string }) => void;
 };
 
 export default function EditClientDialog({
   isDeleting,
   client,
+  onOptimisticEdit,
 }: EditClientDialogProps) {
   const [open, setOpen] = useState(false);
+  const [, startTransition] = useTransition();
 
   async function onSubmit(data: ClientFormData) {
-    const result = await updateClient(client.id, data);
+    setOpen(false);
+    startTransition(async () => {
+      onOptimisticEdit(client.id, { name: data.name, email: data.email });
+      const result = await updateClient(client.id, data);
 
-    if (result.success) {
-      toast.success('Client updated successfully', { position: 'top-center' });
-      setOpen(false);
-    } else {
-      toast.error(`Failed to update client: ${result.error}`, {
-        position: 'top-center',
-      });
-    }
+      if (result.success) {
+        toast.success('Client updated successfully', {
+          position: 'top-center',
+        });
+      } else {
+        toast.error(`Failed to update client: ${result.error}`, {
+          position: 'top-center',
+        });
+      }
+    });
   }
 
   return (

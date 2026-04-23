@@ -37,11 +37,11 @@ export default function CreateInvoiceButton({
   const [open, setOpen] = useState(false);
 
   async function handleCreate(data: InvoiceFormData) {
+    setOpen(false);
     const result = await createInvoice(data);
 
     if (result.success) {
       toast.success('Invoice created successfully', { position: 'top-center' });
-      setOpen(false);
     } else {
       toast.error(`Failed to create invoice: ${result.error}`, {
         position: 'top-center',
