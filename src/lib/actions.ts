@@ -3,6 +3,18 @@ import { revalidatePath } from 'next/cache';
 import { ClientFormData, InvoiceFormData, SettingsFormData } from './schemas';
 import { createClient } from './supabase/server';
 
+function revalidateInvoicePages() {
+  revalidatePath('/overview');
+  revalidatePath('/overview/invoices');
+  revalidatePath('/overview/invoices/[id]', 'page');
+}
+
+function revalidateClientPages() {
+  revalidatePath('/overview');
+  revalidatePath('/overview/invoices');
+  revalidatePath('/overview/clients');
+}
+
 export async function voidInvoice(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
@@ -31,7 +43,7 @@ export async function voidInvoice(
       return { success: false, error: 'Invoice not found or not owned by you' };
     }
 
-    revalidatePath('/overview', 'layout');
+    revalidateInvoicePages();
     return { success: true };
   } catch (e) {
     const errorMessage =
@@ -69,7 +81,7 @@ export async function createNewClient(clientData: ClientFormData): Promise<{
     return { success: false, error: error.message };
   }
 
-  revalidatePath('/overview', 'layout');
+  revalidateClientPages();
   return { success: true, client: data };
 }
 
@@ -110,7 +122,7 @@ export async function createInvoice(
     return { success: false, error: error.message };
   }
 
-  revalidatePath('/overview', 'layout');
+  revalidateInvoicePages();
   return { success: true };
 }
 
@@ -161,7 +173,7 @@ export async function updateInvoice(
     return { success: false, error: error.message };
   }
 
-  revalidatePath('/overview', 'layout');
+  revalidateInvoicePages();
   return { success: true };
 }
 
@@ -191,7 +203,7 @@ export async function updateClient(
     return { success: false, error: error.message };
   }
 
-  revalidatePath('/overview', 'layout');
+  revalidateClientPages();
   return { success: true };
 }
 
@@ -216,7 +228,7 @@ export async function deleteClient(
     return { success: false, error: error.message };
   }
 
-  revalidatePath('/overview', 'layout');
+  revalidateClientPages();
   return { success: true };
 }
 
@@ -246,7 +258,7 @@ export async function markInvoicePaid(
     return { success: false, error: 'Invoice not found or not owned by you' };
   }
 
-  revalidatePath('/overview', 'layout');
+  revalidateInvoicePages();
   return { success: true };
 }
 
@@ -276,7 +288,7 @@ export async function markInvoiceUnpaid(
     return { success: false, error: 'Invoice not found or not owned by you' };
   }
 
-  revalidatePath('/overview', 'layout');
+  revalidateInvoicePages();
   return { success: true };
 }
 
@@ -291,7 +303,7 @@ export async function markInvoiceOverdue(id: string): Promise<void> {
     .update({ status: 'overdue' })
     .eq('id', id)
     .eq('user_id', user.id);
-  revalidatePath('/overview', 'layout');
+  revalidateInvoicePages();
 }
 
 export async function upsertSettings(
