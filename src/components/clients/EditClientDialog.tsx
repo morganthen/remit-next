@@ -1,13 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { clientSchema, ClientFormData } from '@/lib/schemas';
+import dynamic from 'next/dynamic';
+import { ClientFormData } from '@/lib/schemas';
 import { updateClient } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Dialog,
   DialogContent,
@@ -18,6 +15,8 @@ import {
 import { toast } from 'sonner';
 import { Pencil } from 'lucide-react';
 
+const ClientForm = dynamic(() => import('./ClientForm'), { ssr: false });
+
 type EditClientDialogProps = {
   client: {
     id: string;
@@ -25,7 +24,6 @@ type EditClientDialogProps = {
     email: string;
   };
   isDeleting: boolean;
-  // className: string;
 };
 
 export default function EditClientDialog({
@@ -33,19 +31,6 @@ export default function EditClientDialog({
   client,
 }: EditClientDialogProps) {
   const [open, setOpen] = useState(false);
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm<ClientFormData>({
-    resolver: zodResolver(clientSchema),
-    defaultValues: {
-      name: client.name,
-      email: client.email,
-    },
-  });
 
   async function onSubmit(data: ClientFormData) {
     const result = await updateClient(client.id, data);
@@ -61,15 +46,7 @@ export default function EditClientDialog({
   }
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(isOpen) => {
-        setOpen(isOpen);
-        if (isOpen) {
-          reset({ name: client.name, email: client.email });
-        }
-      }}
-    >
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
           variant="ghost"
@@ -84,36 +61,12 @@ export default function EditClientDialog({
         <DialogHeader>
           <DialogTitle>Edit Client</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <Label htmlFor="name">Name</Label>
-            <Input id="name" {...register('name')} />
-            {errors.name && (
-              <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>
-            )}
-          </div>
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" {...register('email')} />
-            {errors.email && (
-              <p className="mt-1 text-xs text-red-500">
-                {errors.email.message}
-              </p>
-            )}
-          </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : 'Save Changes'}
-            </Button>
-          </div>
-        </form>
+        <ClientForm
+          defaultValues={{ name: client.name, email: client.email }}
+          onSubmit={onSubmit}
+          onCancel={() => setOpen(false)}
+          submitLabel="Save Changes"
+        />
       </DialogContent>
     </Dialog>
   );

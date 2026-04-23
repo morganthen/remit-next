@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { Button } from '@/components/ui/button';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import {
@@ -11,9 +12,10 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import InvoiceForm from './InvoiceForm';
 import { createInvoice } from '@/lib/actions';
 import { InvoiceFormData } from '@/lib/schemas';
+
+const InvoiceForm = dynamic(() => import('./InvoiceForm'), { ssr: false });
 
 type Client = {
   id: string;

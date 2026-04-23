@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import {
   Dialog,
   DialogContent,
@@ -7,13 +8,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import InvoiceForm from './InvoiceForm';
 import { updateInvoice } from '@/lib/actions';
 import { Client, Invoice } from '@/lib/types';
 import { InvoiceFormData } from '@/lib/schemas';
 import { toast } from 'sonner';
 import { Button } from '../ui/button';
 import { Pencil } from 'lucide-react';
+
+const InvoiceForm = dynamic(() => import('./InvoiceForm'), { ssr: false });
 
 type EditInvoiceDialogProps = {
   invoice: Invoice;
