@@ -1,7 +1,7 @@
 'use server';
 import { revalidatePath } from 'next/cache';
 import { ClientFormData, InvoiceFormData, SettingsFormData } from './schemas';
-import { createClient } from './supabase/server';
+import { adminCreateClient, getAuthedClient } from './supabase/server';
 
 function revalidateInvoicePages() {
   revalidatePath('/overview');
@@ -19,12 +19,7 @@ export async function voidInvoice(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
+    const { supabase, user } = await getAuthedClient();
     if (!user) return { success: false, error: 'Not authenticated' };
 
     const { data, error } = await supabase
@@ -58,12 +53,7 @@ export async function createNewClient(clientData: ClientFormData): Promise<{
   error?: string;
   client?: { id: string; name: string; email: string };
 }> {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const { supabase, user } = await getAuthedClient();
   if (!user) return { success: false, error: 'Not authenticated' };
 
   const { data, error } = await supabase
@@ -88,12 +78,7 @@ export async function createNewClient(clientData: ClientFormData): Promise<{
 export async function createInvoice(
   invoiceData: InvoiceFormData
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const { supabase, user } = await getAuthedClient();
   if (!user) return { success: false, error: 'Not authenticated' };
 
   // Get next invoice number
@@ -130,12 +115,7 @@ export async function updateInvoice(
   invoiceId: string,
   invoiceData: InvoiceFormData
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const { supabase, user } = await getAuthedClient();
   if (!user) return { success: false, error: 'Not authenticated' };
 
   // Determine paid_at: preserve existing if already paid, set now if newly paid, clear if unpaid
@@ -181,12 +161,7 @@ export async function updateClient(
   clientId: string,
   clientData: ClientFormData
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const { supabase, user } = await getAuthedClient();
   if (!user) return { success: false, error: 'Not authenticated' };
 
   const { error } = await supabase
@@ -210,12 +185,7 @@ export async function updateClient(
 export async function deleteClient(
   clientId: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const { supabase, user } = await getAuthedClient();
   if (!user) return { success: false, error: 'Not authenticated' };
 
   const { error } = await supabase
@@ -235,12 +205,7 @@ export async function deleteClient(
 export async function markInvoicePaid(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const { supabase, user } = await getAuthedClient();
   if (!user) return { success: false, error: 'Not authenticated' };
 
   const { data, error } = await supabase
@@ -265,12 +230,7 @@ export async function markInvoicePaid(
 export async function markInvoiceUnpaid(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const { supabase, user } = await getAuthedClient();
   if (!user) return { success: false, error: 'Not authenticated' };
 
   const { data, error } = await supabase
@@ -293,10 +253,7 @@ export async function markInvoiceUnpaid(
 }
 
 export async function markInvoiceOverdue(id: string): Promise<void> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getAuthedClient();
   if (!user) return;
   await supabase
     .from('invoices')
@@ -309,12 +266,7 @@ export async function markInvoiceOverdue(id: string): Promise<void> {
 export async function upsertSettings(
   data: SettingsFormData
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const { supabase, user } = await getAuthedClient();
   if (!user) return { success: false, error: 'Not authenticated' };
 
   const { error } = await supabase.from('settings').upsert(
@@ -334,5 +286,21 @@ export async function upsertSettings(
   }
 
   revalidatePath('/overview', 'layout');
+  return { success: true };
+}
+
+export async function deleteAccount(
+  id: string
+): Promise<{ success: boolean; error?: string }> {
+  const { supabase, user } = await getAuthedClient();
+  if (!user) return { success: false, error: 'Not authenticated' };
+  if (user.id !== id) return { success: false, error: 'Forbidden' };
+
+  const admin = await adminCreateClient();
+  const { error: deleteError } = await admin.auth.admin.deleteUser(id);
+  if (deleteError) return { success: false, error: deleteError.message };
+
+  await supabase.auth.signOut();
+  revalidatePath('/', 'layout');
   return { success: true };
 }

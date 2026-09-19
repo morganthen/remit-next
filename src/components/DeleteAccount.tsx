@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from './ui/button';
 import { useState } from 'react';
+import { deleteAccount } from '@/lib/actions';
 
 export default function DeleteAccountDialog({
   userId,
@@ -22,16 +23,8 @@ export default function DeleteAccountDialog({
     if (!userId) return console.error('No user id');
     setLoading(true);
     try {
-      const form = new FormData();
-      form.append('id', userId);
-      const res = await fetch('/api/delete-user', {
-        method: 'POST',
-        credentials: 'same-origin',
-        body: form,
-      });
-      const payload = await res.json();
-      if (!res.ok) throw new Error(payload?.error || 'Delete failed');
-      // success: show toast then redirect/sign out
+      const result = await deleteAccount(userId);
+      if (!result.success) throw new Error(result.error || 'Delete failed');
       window.location.href = '/signup';
     } catch (err) {
       console.error(err);
