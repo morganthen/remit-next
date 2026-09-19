@@ -1,5 +1,7 @@
 'use client';
 
+import { useTransition } from 'react';
+import dynamic from 'next/dynamic';
 import {
   Dialog,
   DialogContent,
@@ -7,20 +9,27 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import InvoiceForm from './InvoiceForm';
 import { updateInvoice } from '@/lib/actions';
 import { Client, Invoice } from '@/lib/types';
 import { InvoiceFormData } from '@/lib/schemas';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 import { Button } from '../ui/button';
 import { Pencil } from 'lucide-react';
+
+const InvoiceForm = dynamic(() => import('./InvoiceForm'), { ssr: false });
 
 type EditInvoiceDialogProps = {
   invoice: Invoice;
   clients: Client[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onOptimisticEdit: (data: {
+    client_name: string;
+    client_email: string;
+    amount: number;
+    due_date: string;
+    status: Invoice['status'];
+  }) => void;
 };
 
 export default function EditInvoiceDialog({
@@ -28,18 +37,27 @@ export default function EditInvoiceDialog({
   clients,
   open,
   onOpenChange,
+  onOptimisticEdit,
 }: EditInvoiceDialogProps) {
-  const router = useRouter();
+  const [, startTransition] = useTransition();
 
   async function handleSubmit(data: InvoiceFormData) {
-    const result = await updateInvoice(invoice.id, data);
-    if (result.success) {
-      toast.success('Invoice updated');
-      onOpenChange(false);
-      router.refresh();
-    } else {
-      toast.error(result.error ?? 'Failed to update invoice');
-    }
+    onOpenChange(false);
+    startTransition(async () => {
+      onOptimisticEdit({
+        client_name: data.client_name,
+        client_email: data.client_email,
+        amount: data.amount,
+        due_date: data.due_date,
+        status: data.status,
+      });
+      const result = await updateInvoice(invoice.id, data);
+      if (result.success) {
+        toast.success('Invoice updated');
+      } else {
+        toast.error(result.error ?? 'Failed to update invoice');
+      }
+    });
   }
 
   return (

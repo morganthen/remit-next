@@ -1,6 +1,8 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
+const AUTH_TIMEOUT_MS = 5000;
+
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -22,63 +24,42 @@ export async function middleware(request: NextRequest) {
           );
         },
       },
+      global: {
+        fetch: (input, init) =>
+          fetch(input, {
+            ...init,
+            signal: init?.signal ?? AbortSignal.timeout(AUTH_TIMEOUT_MS),
+          }),
+      },
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
   const { pathname } = request.nextUrl;
+  const isAuthPath =
+    pathname.startsWith('/login') || pathname.startsWith('/signup');
 
-  const authPaths = ['/login', '/signup'];
-  const publicPaths = [...authPaths, '/invoice'];
-  const isPublicPath = publicPaths.some((path) => pathname.startsWith(path));
-  const isAuthPath = authPaths.some((path) => pathname.startsWith(path));
+  let user = null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch {
+    // Supabase unreachable (paused project, DNS failure, network error).
+    // Fail open so the whole site doesn't 504; pages re-check auth server-side.
+    return supabaseResponse;
+  }
 
   // Not logged in -> only allow public paths, otherwise send to login
-  if (!user && !isPublicPath && pathname !== '/') {
+  if (!user && !isAuthPath && pathname !== '/') {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
   }
 
-  // Logged in + trying to access login/signup (not /invoice) → root
+  // Logged in + on landing/login/signup -> dashboard
   if (user && (pathname === '/' || isAuthPath)) {
     const url = request.nextUrl.clone();
     url.pathname = '/overview';
     return NextResponse.redirect(url);
-  }
-
-  // Logged in -> check if they have settings (i.e. completed onboarding)
-  if (user && !isPublicPath && pathname !== '/onboarding') {
-    const { data: settings } = await supabase
-      .from('settings')
-      .select('user_id')
-      .eq('user_id', user.id)
-      .single();
-
-    // No settings row then send to onboarding
-    if (!settings) {
-      const url = request.nextUrl.clone();
-      url.pathname = '/onboarding';
-      return NextResponse.redirect(url);
-    }
-  }
-
-  // logged in + has settings + trying to visit onboarding → overview
-  if (user && pathname === '/onboarding') {
-    const { data: settings } = await supabase
-      .from('settings')
-      .select('user_id')
-      .eq('user_id', user.id)
-      .single();
-
-    if (settings) {
-      const url = request.nextUrl.clone();
-      url.pathname = '/overview';
-      return NextResponse.redirect(url);
-    }
   }
 
   return supabaseResponse;
@@ -86,6 +67,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!api|invoice|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

@@ -27,6 +27,14 @@ export async function createClient() {
   );
 }
 
+export async function getAuthedClient() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return { supabase, user };
+}
+
 export async function adminCreateClient() {
   const cookieStore = await cookies();
 
